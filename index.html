@@ -161,12 +161,19 @@
             width: 100px; /* Fixed width for category/store items */
             text-align: center;
         }
-        .category-item img, .store-item img {
+        .category-item img {
             width: 60px; /* Adjust size as needed */
             height: 60px; /* Adjust size as needed */
             object-fit: contain; /* Ensure image fits without cropping */
             margin: 0 auto;
             border-radius: 9999px; /* For circular images if desired */
+        }
+        .store-item img {
+            width: 80px; /* Adjust size as needed */
+            height: 80px; /* Adjust size as needed */
+            object-fit: cover; /* Ensure image fits without cropping */
+            margin: 0 auto;
+            border-radius: 0.5rem; /* Changed to square with rounded corners */
         }
     </style>
 </head>
@@ -264,7 +271,7 @@
     <!-- Participating Stores Section -->
     <section class="container mx-auto p-4 mt-6">
         <h2 class="text-xl font-bold text-gray-800 mb-4">ร้านที่ร่วมรายการ</h2>
-        <div class="rounded-xl shadow-md p-4 overflow-x-auto whitespace-nowrap">
+        <div class="overflow-x-auto whitespace-nowrap"> <!-- Removed rounded-xl, shadow-md, p-4 from here -->
             <div class="flex space-x-4">
                 <div class="store-item flex flex-col items-center cursor-pointer hover:opacity-75 transition duration-200">
                     <img src="https://placehold.co/80x80/B3E0FF/FFFFFF?text=Store1" alt="Store 1" class="rounded-lg mb-1">
