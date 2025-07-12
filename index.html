@@ -1,0 +1,1208 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moon - เว็บขายสินค้า</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Font Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- html2canvas CDN for generating image from HTML -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            background-color: #f3f4f6; /* bg-gray-100 */
+        }
+        /* Custom styles for better visual */
+        .product-card-image {
+            object-fit: cover;
+            width: 100%;
+            height: 192px; /* h-48 */
+        }
+        .product-detail-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 0.5rem; /* rounded-lg */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* shadow-md */
+        }
+        .admin-sidebar button {
+            transition: background-color 0.2s, color 0.2s;
+        }
+        .admin-sidebar button.active {
+            background-color: #e0f2fe; /* bg-blue-100 */
+            color: #1d4ed8; /* text-blue-700 */
+            font-weight: 600; /* font-semibold */
+        }
+
+        /* Custom Modal Styles */
+        .custom-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        .custom-modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        .custom-modal-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 0.75rem; /* rounded-xl */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            transform: translateY(-20px);
+            opacity: 0;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+        .custom-modal-overlay.show .custom-modal-content {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        /* Specific styles for password modal */
+        #password-modal .custom-modal-content {
+            padding: 1.5rem;
+        }
+        #password-modal input[type="password"] {
+            width: 100%;
+            padding: 0.75rem;
+            margin-top: 1rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid #d1d5db; /* border-gray-300 */
+            border-radius: 0.375rem; /* rounded-md */
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); /* shadow-sm */
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        #password-modal input[type="password"]:focus {
+            border-color: #3b82f6; /* focus:border-blue-500 */
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5); /* focus:ring-blue-500 */
+        }
+        #password-modal .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        /* Styles for the receipt container (hidden by default) */
+        #receipt-container {
+            position: absolute;
+            left: -9999px; /* Hide off-screen */
+            top: -9999px;
+            width: 300px; /* Fixed width for receipt image */
+            padding: 20px;
+            background-color: white;
+            border: 1px solid #ddd;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            font-family: 'Inter', sans-serif;
+            color: #333;
+            box-sizing: border-box;
+        }
+        #receipt-container h2 {
+            text-align: center;
+            margin-bottom: 15px;
+            font-size: 20px;
+            color: #222;
+        }
+        #receipt-container .receipt-header,
+        #receipt-container .receipt-footer {
+            text-align: center;
+            font-size: 12px;
+            margin-bottom: 10px;
+        }
+        #receipt-container .receipt-item {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            padding: 5px 0;
+            border-bottom: 1px dashed #eee;
+        }
+        #receipt-container .receipt-item:last-of-type {
+            border-bottom: none;
+        }
+        #receipt-container .receipt-total {
+            display: flex;
+            justify-content: space-between;
+            font-size: 16px;
+            font-weight: bold;
+            padding-top: 10px;
+            border-top: 1px solid #ddd;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gray-100 font-sans antialiased">
+
+    <!-- Custom Modal for Alerts -->
+    <div id="custom-alert-modal" class="custom-modal-overlay">
+        <div class="custom-modal-content">
+            <p id="custom-alert-message" class="text-lg text-gray-800 mb-6"></p>
+            <button id="custom-alert-ok-button" class="bg-blue-600 text-white py-2 px-6 rounded-lg hover:bg-blue-700 transition duration-200">
+                ตกลง
+            </button>
+        </div>
+    </div>
+
+    <!-- Custom Modal for Password Input -->
+    <div id="password-modal" class="custom-modal-overlay">
+        <div class="custom-modal-content">
+            <p class="text-lg text-gray-800 mb-4">กรุณาใส่รหัสผ่านเพื่อเข้าสู่หน้าจัดการเว็บไซต์:</p>
+            <input type="password" id="password-input" placeholder="รหัสผ่าน">
+            <div class="button-group">
+                <button id="password-submit-button" class="bg-blue-600 text-white py-2 px-6 rounded-lg hover:bg-blue-700 transition duration-200">
+                    เข้าสู่ระบบ
+                </button>
+                <button id="password-cancel-button" class="bg-gray-300 text-gray-800 py-2 px-6 rounded-lg hover:bg-gray-400 transition duration-200">
+                    ยกเลิก
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="bg-white shadow-md p-4 sticky top-0 z-10">
+        <div class="container mx-auto flex flex-col md:flex-row items-center justify-between">
+            <div class="flex items-center mb-3 md:mb-0">
+                <button id="home-button" class="text-blue-600 hover:text-blue-800 transition duration-200">
+                    <i data-lucide="home" class="w-7 h-7 mr-2"></i>
+                </button>
+                <h1 class="text-2xl font-bold text-gray-800">
+                    <span class="text-blue-600">Moon</span>
+                </h1>
+            </div>
+
+            <div class="relative w-full md:w-1/2 lg:w-1/3 mb-3 md:mb-0">
+                <input type="text" id="search-input" placeholder="ค้นหาสินค้า..."
+                    class="w-full p-2 pl-10 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <i data-lucide="search" class="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+            </div>
+
+            <div class="flex items-center space-x-4">
+                <button id="cart-button" class="relative bg-blue-500 text-white p-2 rounded-full hover:bg-blue-600 transition duration-200 shadow-md">
+                    <i data-lucide="shopping-cart" class="w-6 h-6"></i>
+                    <span id="cart-item-count" class="absolute -top-1 -right-1 bg-red-600 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                        0
+                    </span>
+                </button>
+                <!-- Admin Management Link -->
+                <button id="admin-panel-button" class="text-gray-600 hover:text-blue-600 transition duration-200 font-semibold flex items-center" title="จัดการเว็บไซต์">
+                    <i data-lucide="settings" class="w-5 h-5"></i> <!-- Removed mr-1 and text -->
+                    : <!-- Only colon remains -->
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main id="main-content" class="container mx-auto p-4">
+        <!-- Content will be rendered here by JavaScript -->
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white p-6 mt-8">
+        <div class="container mx-auto text-center text-sm">
+            <p>&copy; 2023 Moon Clone. สงวนลิขสิทธิ์.</p>
+            <p class="mt-2">สร้างขึ้นเพื่อการสาธิตเท่านั้น</p>
+        </div>
+    </footer>
+
+    <!-- Hidden Receipt Container (for image generation) -->
+    <div id="receipt-container">
+        <!-- Receipt content will be dynamically generated here -->
+    </div>
+
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // --- Global State Variables ---
+        let currentPage = 'home'; // 'home', 'productDetail', 'cart', 'adminPanel'
+        let selectedProductId = null;
+        let cartItems = [];
+        let searchTerm = '';
+
+        // Mock Data (will not persist on page refresh)
+        let products = [
+            { id: 'prod1', name: 'สมาร์ทโฟนรุ่นใหม่ล่าสุด', description: 'สมาร์ทโฟนประสิทธิภาพสูง กล้องคมชัด แบตเตอรี่ทนทาน', price: 15999, image: 'https://placehold.co/300x300/ADD8E6/FFFFFF?text=Smartphone', sellerId: 'seller1', rating: 4.8, reviews: 120, stock: 50 },
+            { id: 'prod2', name: 'หูฟังไร้สายพรีเมียม', description: 'หูฟังตัดเสียงรบกวน เสียงใส เบสแน่น', price: 2499, image: 'https://placehold.co/300x300/90EE90/FFFFFF?text=Headphones', sellerId: 'seller1', rating: 4.5, reviews: 85, stock: 100 },
+            { id: 'prod3', name: 'เสื้อยืดโอเวอร์ไซส์', description: 'เสื้อยืดผ้าคอตตอน 100% สวมใส่สบาย สไตล์มินิมอล', price: 399, image: 'https://placehold.co/300x300/FFB6C1/FFFFFF?text=T-Shirt', sellerId: 'seller2', rating: 4.2, reviews: 200, stock: 300 },
+            { id: 'prod4', name: 'กางเกงยีนส์เดนิม', description: 'กางเกงยีนส์ทรงกระบอกเล็ก ดีไซน์คลาสสิก', price: 899, image: 'https://placehold.co/300x300/FFDAB9/FFFFFF?text=Jeans', sellerId: 'seller2', rating: 4.6, reviews: 150, stock: 120 },
+            { id: 'prod5', name: 'ชุดเครื่องนอนผ้าฝ้าย', description: 'ชุดเครื่องนอนนุ่มสบาย ระบายอากาศได้ดี', price: 1890, image: 'https://placehold.co/300x300/ADD8E6/FFFFFF?text=Bedding', sellerId: 'seller3', rating: 4.7, reviews: 90, stock: 70 },
+            { id: 'prod6', name: 'โคมไฟตั้งโต๊ะมินิมอล', description: 'โคมไฟดีไซน์เรียบง่าย ให้แสงสว่างอบอุ่น', price: 650, image: 'https://placehold.co/300x300/D8BFD8/FFFFFF?text=Lamp', sellerId: 'seller3', rating: 4.3, reviews: 60, stock: 80 },
+        ];
+
+        let sellers = [
+            { id: 'seller1', name: 'Gadget Galaxy', description: 'ร้านค้าอุปกรณ์อิเล็กทรอนิกส์และแกดเจ็ตสุดล้ำ', image: 'https://placehold.co/100x100/AEC6CF/FFFFFF?text=Seller1', location: 'กรุงเทพมหานคร', contact: '081-123-4567', status: 'active' },
+            { id: 'seller2', name: 'Fashion Forward', description: 'เสื้อผ้าแฟชั่นทันสมัยสำหรับทุกสไตล์', image: 'https://placehold.co/100x100/FFDDC1/FFFFFF?text=Seller2', location: 'เชียงใหม่', contact: '089-765-4321', status: 'active' },
+            { id: 'seller3', name: 'Home Comforts', description: 'ของใช้ในบ้านคุณภาพดีเพื่อความสุขของคุณ', image: 'https://placehold.co/100x100/D4EDDA/FFFFFF?text=Seller3', location: 'ภูเก็ต', contact: '092-345-6789', status: 'pending' },
+        ];
+
+        // --- DOM Elements ---
+        const mainContent = document.getElementById('main-content');
+        const cartItemCountSpan = document.getElementById('cart-item-count');
+        const searchInput = document.getElementById('search-input');
+        const homeButton = document.getElementById('home-button');
+        const cartButton = document.getElementById('cart-button');
+        const adminPanelButton = document.getElementById('admin-panel-button');
+
+        // --- Custom Alert/Message Box ---
+        const customAlertModal = document.getElementById('custom-alert-modal');
+        const customAlertMessage = document.getElementById('custom-alert-message');
+        const customAlertOkButton = document.getElementById('custom-alert-ok-button');
+
+        function showCustomAlert(message) {
+            customAlertMessage.textContent = message;
+            customAlertModal.classList.add('show');
+        }
+
+        customAlertOkButton.addEventListener('click', () => {
+            customAlertModal.classList.remove('show');
+        });
+
+        // --- Password Modal ---
+        const passwordModal = document.getElementById('password-modal');
+        const passwordInput = document.getElementById('password-input');
+        const passwordSubmitButton = document.getElementById('password-submit-button');
+        const passwordCancelButton = document.getElementById('password-cancel-button');
+        const ADMIN_PASSWORD = 'B11'; // Define the password here
+
+        function showPasswordModal() {
+            passwordInput.value = ''; // Clear input field
+            passwordModal.classList.add('show');
+            passwordInput.focus(); // Focus on the input field
+        }
+
+        function hidePasswordModal() {
+            passwordModal.classList.remove('show');
+        }
+
+        passwordSubmitButton.addEventListener('click', () => {
+            const enteredPassword = passwordInput.value;
+            if (enteredPassword === ADMIN_PASSWORD) {
+                hidePasswordModal();
+                navigateTo('adminPanel');
+            } else {
+                showCustomAlert('รหัสผ่านไม่ถูกต้อง!');
+                passwordInput.value = ''; // Clear input on wrong password
+            }
+        });
+
+        passwordCancelButton.addEventListener('click', () => {
+            hidePasswordModal();
+        });
+
+        passwordInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                passwordSubmitButton.click(); // Simulate click on submit button
+            }
+        });
+
+
+        // --- Helper Functions ---
+        function getSellerById(sellerId) {
+            return sellers.find(seller => seller.id === sellerId);
+        }
+
+        function updateCartItemCount() {
+            const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+            cartItemCountSpan.textContent = totalItems;
+            if (totalItems > 0) {
+                cartItemCountSpan.classList.remove('hidden');
+            } else {
+                cartItemCountSpan.classList.add('hidden');
+            }
+        }
+
+        function navigateTo(page, id = null) {
+            currentPage = page;
+            selectedProductId = id;
+            renderPage();
+        }
+
+        // --- Render Functions for Pages ---
+
+        function renderHomePage() {
+            mainContent.innerHTML = ''; // Clear previous content
+            const activeSellerIds = sellers.filter(s => s.status === 'active').map(s => s.id);
+
+            const filteredProducts = products.filter(product =>
+                activeSellerIds.includes(product.sellerId) &&
+                (product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                product.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                getSellerById(product.sellerId)?.name.toLowerCase().includes(searchTerm.toLowerCase()))
+            );
+
+            const productGrid = document.createElement('div');
+            // Changed gap-6 to gap-4
+            productGrid.className = 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4';
+
+            if (filteredProducts.length === 0) {
+                productGrid.innerHTML = `
+                    <div class="col-span-full text-center text-gray-600 text-lg py-10">
+                        ไม่พบสินค้าที่ตรงกับการค้นหาของคุณ
+                    </div>
+                `;
+            } else {
+                filteredProducts.forEach(product => {
+                    const seller = getSellerById(product.sellerId);
+                    const productCard = document.createElement('div');
+                    productCard.className = 'bg-white rounded-xl shadow-md overflow-hidden transform transition duration-300 hover:scale-105 hover:shadow-lg cursor-pointer flex flex-col';
+                    productCard.dataset.productId = product.id; // Store product ID
+
+                    productCard.innerHTML = `
+                        <img src="${product.image}" alt="${product.name}" class="product-card-image rounded-t-xl" onerror="this.onerror=null;this.src='https://placehold.co/300x300/CCCCCC/333333?text=Image+Error';">
+                        <div class="p-3 flex-grow flex flex-col justify-between"> <!-- Changed p-4 to p-3 -->
+                            <div>
+                                <h3 class="text-lg font-semibold text-gray-800 mb-1 line-clamp-2">${product.name}</h3>
+                                <p class="text-sm text-gray-600 mb-2 flex items-center">
+                                    <i data-lucide="store" class="w-3.5 h-3.5 mr-1 text-blue-500"></i>
+                                    ${seller ? seller.name : 'ไม่ระบุผู้ขาย'}
+                                </p>
+                                <div class="flex items-center mb-2">
+                                    <i data-lucide="star" class="w-4 h-4 text-yellow-400 mr-1" fill="currentColor"></i>
+                                    <span class="text-sm text-gray-700">${product.rating.toFixed(1)} (${product.reviews} รีวิว)</span>
+                                </div>
+                                <p class="text-xl font-bold text-red-600 mb-3">฿${product.price.toLocaleString()}</p>
+                            </div>
+                            <button class="add-to-cart-button w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-200 shadow-md">
+                                เพิ่มลงตะกร้า
+                            </button>
+                        </div>
+                    `;
+                    productGrid.appendChild(productCard);
+
+                    // Add event listener for product card click
+                    productCard.addEventListener('click', (e) => {
+                        if (!e.target.classList.contains('add-to-cart-button')) {
+                            navigateTo('productDetail', product.id);
+                        }
+                    });
+
+                    // Add event listener for add to cart button
+                    productCard.querySelector('.add-to-cart-button').addEventListener('click', (e) => {
+                        e.stopPropagation(); // Prevent card click from firing
+                        handleAddToCart(product);
+                    });
+                });
+            }
+            mainContent.appendChild(productGrid);
+            lucide.createIcons(); // Re-render Lucide icons for new elements
+        }
+
+        function renderProductDetailPage() {
+            mainContent.innerHTML = ''; // Clear previous content
+            const product = products.find(p => p.id === selectedProductId);
+            const seller = product ? getSellerById(product.sellerId) : null;
+
+            if (!product) {
+                mainContent.innerHTML = `
+                    <div class="p-4 text-center text-gray-700">
+                        <p>ไม่พบสินค้า</p>
+                        <button id="back-to-home-button" class="mt-4 bg-gray-300 text-gray-800 py-2 px-4 rounded-lg hover:bg-gray-400 transition duration-200">
+                            กลับหน้าหลัก
+                        </button>
+                    </div>
+                `;
+                document.getElementById('back-to-home-button').addEventListener('click', () => navigateTo('home'));
+                return;
+            }
+
+            const detailPageHtml = `
+                <button id="back-to-shopping-button" class="mb-4 flex items-center text-blue-600 hover:text-blue-800 transition duration-200">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+                    </svg>
+                    กลับไปช้อปปิ้ง
+                </button>
+
+                <div class="bg-white rounded-xl shadow-lg p-6 md:p-8 flex flex-col md:flex-row gap-6 md:gap-8">
+                    <div class="md:w-1/2 flex justify-center items-center">
+                        <img src="${product.image}" alt="${product.name}" class="product-detail-image" onerror="this.onerror=null;this.src='https://placehold.co/400x400/CCCCCC/333333?text=Image+Error';">
+                    </div>
+                    <div class="md:w-1/2">
+                        <h1 class="text-3xl font-bold text-gray-900 mb-3">${product.name}</h1>
+                        <p class="text-2xl font-bold text-red-600 mb-4">฿${product.price.toLocaleString()}</p>
+
+                        <div class="flex items-center text-gray-700 mb-4">
+                            <i data-lucide="star" class="w-5 h-5 text-yellow-400 mr-2" fill="currentColor"></i>
+                            <span class="text-lg font-semibold">${product.rating.toFixed(1)}</span>
+                            <span class="text-md ml-2">(${product.reviews} รีวิว)</span>
+                        </div>
+
+                        <p class="text-gray-800 mb-6 leading-relaxed">${product.description}</p>
+
+                        <div class="bg-gray-100 p-4 rounded-lg mb-6">
+                            <h2 class="text-xl font-semibold text-gray-800 mb-3 flex items-center">
+                                <i data-lucide="store" class="w-5 h-5 mr-2 text-blue-500"></i>
+                                ร้านค้า: ${seller ? seller.name : 'ไม่ระบุผู้ขาย'}
+                            </h2>
+                            ${seller ? `
+                                <p class="text-gray-700 flex items-center mb-1">
+                                    <i data-lucide="map-pin" class="w-4 h-4 mr-2 text-gray-600"></i>
+                                    ที่ตั้ง: ${seller.location}
+                                </p>
+                                <p class="text-gray-700 flex items-center mb-1">
+                                    <i data-lucide="phone" class="w-4 h-4 mr-2 text-gray-600"></i>
+                                    ติดต่อ: ${seller.contact}
+                                </p>
+                                <p class="text-gray-700 flex items-center">
+                                    <i data-lucide="user" class="w-4 h-4 mr-2 text-gray-600"></i>
+                                    รายละเอียด: ${seller.description}
+                                </p>
+                            ` : ''}
+                        </div>
+
+                        <button id="detail-add-to-cart-button" class="w-full bg-blue-600 text-white py-3 px-6 rounded-lg text-lg font-semibold hover:bg-blue-700 transition duration-200 shadow-lg">
+                            <i data-lucide="shopping-cart" class="inline-block w-5 h-5 mr-2"></i>
+                            เพิ่มลงตะกร้า
+                        </button>
+                    </div>
+                </div>
+            `;
+            mainContent.innerHTML = detailPageHtml;
+            lucide.createIcons(); // Re-render Lucide icons
+
+            document.getElementById('back-to-shopping-button').addEventListener('click', () => navigateTo('home'));
+            document.getElementById('detail-add-to-cart-button').addEventListener('click', () => handleAddToCart(product));
+        }
+
+        function renderCartPage() {
+            mainContent.innerHTML = ''; // Clear previous content
+            const total = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
+            let cartHtml = `
+                <button id="back-from-cart-button" class="mb-4 flex items-center text-blue-600 hover:text-blue-800 transition duration-200">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+                    </svg>
+                    กลับไปช้อปปิ้ง
+                </button>
+
+                <h1 class="text-3xl font-bold text-gray-900 mb-6">ตะกร้าสินค้า</h1>
+            `;
+
+            if (cartItems.length === 0) {
+                cartHtml += `
+                    <div class="text-center text-gray-600 text-lg">
+                        <p>ไม่มีสินค้าในตะกร้า</p>
+                        <button id="start-shopping-button" class="mt-6 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-200">
+                            เริ่มช้อปปิ้ง
+                        </button>
+                    </div>
+                `;
+            } else {
+                cartHtml += `
+                    <div class="bg-white rounded-xl shadow-lg p-6 md:p-8">
+                        ${cartItems.map(item => `
+                            <div class="flex items-center border-b border-gray-200 py-4 last:border-b-0">
+                                <img src="${item.image}" alt="${item.name}" class="w-20 h-20 object-cover rounded-md mr-4" onerror="this.onerror=null;this.src='https://placehold.co/80x80/CCCCCC/333333?text=Image';">
+                                <div class="flex-grow">
+                                    <h3 class="text-lg font-semibold text-gray-800">${item.name}</h3>
+                                    <p class="text-gray-600 text-sm">จำนวน: ${item.quantity}</p>
+                                    <p class="text-red-600 font-bold">฿${(item.price * item.quantity).toLocaleString()}</p>
+                                </div>
+                                <button data-product-id="${item.id}" class="remove-from-cart-button bg-red-500 text-white py-1 px-3 rounded-lg hover:bg-red-600 transition duration-200 text-sm">
+                                    ลบ
+                                </button>
+                            </div>
+                        `).join('')}
+                        <div class="flex justify-between items-center mt-6 pt-4 border-t border-gray-200">
+                            <span class="text-xl font-bold text-gray-900">รวมทั้งหมด:</span>
+                            <span class="text-2xl font-bold text-red-600">฿${total.toLocaleString()}</span>
+                        </div>
+                        <button id="checkout-button" class="w-full mt-6 bg-green-600 text-white py-3 px-6 rounded-lg text-lg font-semibold hover:bg-green-700 transition duration-200 shadow-lg">
+                            ดำเนินการชำระเงิน
+                        </button>
+                    </div>
+                `;
+            }
+            mainContent.innerHTML = cartHtml;
+
+            if (cartItems.length === 0) {
+                document.getElementById('start-shopping-button').addEventListener('click', () => navigateTo('home'));
+            } else {
+                document.querySelectorAll('.remove-from-cart-button').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        const productId = e.target.dataset.productId;
+                        handleRemoveFromCart(productId);
+                    });
+                });
+                // Attach event listener to checkout button
+                document.getElementById('checkout-button').addEventListener('click', handleCheckout);
+            }
+            document.getElementById('back-from-cart-button').addEventListener('click', () => navigateTo('home'));
+        }
+
+        // --- Handle Checkout and Generate Receipt ---
+        async function handleCheckout() {
+            if (cartItems.length === 0) {
+                showCustomAlert('ไม่มีสินค้าในตะกร้าเพื่อดำเนินการชำระเงิน!');
+                return;
+            }
+
+            const receiptContainer = document.getElementById('receipt-container');
+            const total = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+            const now = new Date();
+            const dateTime = now.toLocaleString('th-TH', {
+                year: 'numeric', month: 'long', day: 'numeric',
+                hour: '2-digit', minute: '2-digit', second: '2-digit'
+            });
+            const orderId = `ORDER-${Date.now()}`;
+
+            let receiptContentHtml = `
+                <div style="font-family: 'Inter', sans-serif; padding: 20px; width: 100%; box-sizing: border-box; color: #333;">
+                    <h2 style="text-align: center; margin-bottom: 15px; font-size: 20px; color: #222;">ใบเสร็จรับเงิน</h2>
+                    <div class="receipt-header" style="text-align: center; font-size: 12px; margin-bottom: 10px;">
+                        <p>Moon E-commerce</p>
+                        <p>วันที่: ${dateTime}</p>
+                        <p>รหัสคำสั่งซื้อ: ${orderId}</p>
+                        <p>-----------------------------------</p>
+                    </div>
+                    <div style="margin-bottom: 10px;">
+                        ${cartItems.map(item => `
+                            <div class="receipt-item" style="display: flex; justify-content: space-between; font-size: 14px; padding: 5px 0; border-bottom: 1px dashed #eee;">
+                                <span>${item.name} (x${item.quantity})</span>
+                                <span>฿${(item.price * item.quantity).toLocaleString()}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div class="receipt-total" style="display: flex; justify-content: space-between; font-size: 16px; font-weight: bold; padding-top: 10px; border-top: 1px solid #ddd; margin-top: 10px;">
+                        <span>รวมทั้งหมด:</span>
+                        <span>฿${total.toLocaleString()}</span>
+                    </div>
+                    <div class="receipt-footer" style="text-align: center; font-size: 12px; margin-top: 20px; border-top: 1px dashed #eee; padding-top: 10px;">
+                        <p>ขอบคุณที่ใช้บริการ!</p>
+                        <p>ติดต่อ: contact@moon.com</p>
+                    </div>
+                </div>
+            `;
+
+            receiptContainer.innerHTML = receiptContentHtml;
+
+            // Use html2canvas to capture the receipt container as an image
+            try {
+                const canvas = await html2canvas(receiptContainer, {
+                    scale: 2, // Increase scale for better quality
+                    useCORS: true, // Important if images are from external sources
+                    logging: false // Disable logging for cleaner console
+                });
+
+                // Convert canvas to data URL (PNG)
+                const image = canvas.toDataURL('image/png');
+
+                // Create a temporary link element for download
+                const link = document.createElement('a');
+                link.href = image;
+                link.download = `receipt_${orderId}.png`; // Filename for download
+                document.body.appendChild(link); // Append to body to make it clickable
+                link.click(); // Simulate click to trigger download
+                document.body.removeChild(link); // Clean up the temporary link
+
+                // Clear cart and navigate back to home page
+                cartItems = [];
+                updateCartItemCount();
+                showCustomAlert('การชำระเงินสำเร็จ! ใบเสร็จจะถูกดาวน์โหลดโดยอัตโนมัติ');
+                navigateTo('home');
+
+            } catch (error) {
+                console.error('Error generating receipt image:', error);
+                showCustomAlert('เกิดข้อผิดพลาดในการสร้างใบเสร็จ: ' + error.message);
+            } finally {
+                receiptContainer.innerHTML = ''; // Clear receipt container
+            }
+        }
+
+
+        // --- Admin Panel Sub-Components Render Functions ---
+
+        function renderProductManagement() {
+            let currentEditingProduct = null; // To store product being edited
+            let productFormHtml = `
+                <div class="bg-white rounded-xl shadow-lg p-4 md:p-6 mb-8"> <!-- Changed p-6 md:p-8 to p-4 md:p-6 -->
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                        <i data-lucide="package" class="w-6 h-6 mr-2 text-blue-600"></i>
+                        จัดการสินค้า
+                    </h2>
+
+                    <!-- Product Add/Edit Form -->
+                    <form id="product-form" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8 p-4 border border-gray-200 rounded-lg bg-gray-50">
+                        <div class="md:col-span-2">
+                            <h3 id="product-form-title" class="text-xl font-semibold text-gray-800 mb-4">เพิ่มสินค้าใหม่</h3>
+                        </div>
+                        <div>
+                            <label for="product-name" class="block text-sm font-medium text-gray-700">ชื่อสินค้า</label>
+                            <input type="text" id="product-name" name="name" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2" required>
+                        </div>
+                        <div>
+                            <label for="product-price" class="block text-sm font-medium text-gray-700">ราคา (฿)</label>
+                            <input type="number" id="product-price" name="price" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2" min="0" step="0.01" required>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label for="product-description" class="block text-sm font-medium text-gray-700">คำอธิบาย</label>
+                            <textarea id="product-description" name="description" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2"></textarea>
+                        </div>
+                        <div>
+                            <label for="product-image" class="block text-sm font-medium text-gray-700">URL รูปภาพ</label>
+                            <input type="text" id="product-image" name="image" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2" placeholder="https://...">
+                        </div>
+                        <div>
+                            <label for="product-sellerId" class="block text-sm font-medium text-gray-700">ผู้ขาย</label>
+                            <select id="product-sellerId" name="sellerId" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2" required>
+                                <option value="">เลือกผู้ขาย</option>
+                                ${sellers.map(seller => `<option value="${seller.id}">${seller.name}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div>
+                            <label for="product-stock" class="block text-sm font-medium text-gray-700">สต็อก</label>
+                            <input type="number" id="product-stock" name="stock" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2" min="0" required>
+                        </div>
+                        <div class="md:col-span-2 flex justify-end space-x-3">
+                            <button type="submit" id="product-submit-button" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                <i data-lucide="plus-circle" class="w-4 h-4 mr-2"></i>
+                                เพิ่มสินค้า
+                            </button>
+                            <button type="button" id="product-cancel-button" class="hidden inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                ยกเลิก
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- Product List -->
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4">รายการสินค้าทั้งหมด</h3>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">สินค้า</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ผู้ขาย</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ราคา</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">สต็อก</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">การดำเนินการ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="product-list-body" class="bg-white divide-y divide-gray-200">
+                                <!-- Product rows will be inserted here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+            // This is a temporary container for the product management section.
+            // In renderAdminPanel, we will append this to the main content.
+            const productManagementContainer = document.createElement('div');
+            productManagementContainer.innerHTML = productFormHtml;
+
+            // Append to the main content area (or a specific tab content area)
+            // For now, assume it's appended to a div that will be inserted into mainContent
+            return productManagementContainer;
+        }
+
+        function populateProductList() {
+            const productListBody = document.getElementById('product-list-body');
+            if (!productListBody) return; // Ensure element exists
+
+            productListBody.innerHTML = ''; // Clear existing rows
+
+            products.forEach(product => {
+                const seller = getSellerById(product.sellerId);
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 h-10 w-10">
+                                <img class="h-10 w-10 rounded-full object-cover" src="${product.image}" alt="${product.name}" onerror="this.onerror=null;this.src='https://placehold.co/40x40/CCCCCC/333333?text=Img';">
+                            </div>
+                            <div class="ml-4">
+                                <div class="text-sm font-medium text-gray-900">${product.name}</div>
+                                <div class="text-sm text-gray-500 line-clamp-1">${product.description}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        ${seller ? seller.name : 'ไม่ระบุ'}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">฿${product.price.toLocaleString()}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${product.stock}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <button data-product-id="${product.id}" class="edit-product-button text-indigo-600 hover:text-indigo-900 mr-3">
+                            <i data-lucide="edit" class="w-4.5 h-4.5"></i>
+                        </button>
+                        <button data-product-id="${product.id}" class="delete-product-button text-red-600 hover:text-red-900">
+                            <i data-lucide="trash-2" class="w-4.5 h-4.5"></i>
+                        </button>
+                    </td>
+                `;
+                productListBody.appendChild(row);
+            });
+            lucide.createIcons(); // Re-render Lucide icons for new elements
+
+            // Add event listeners for edit and delete buttons
+            productListBody.querySelectorAll('.edit-product-button').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const productId = e.currentTarget.dataset.productId;
+                    const productToEdit = products.find(p => p.id === productId);
+                    if (productToEdit) {
+                        currentEditingProduct = productToEdit;
+                        document.getElementById('product-form-title').textContent = 'แก้ไขสินค้า';
+                        document.getElementById('product-submit-button').innerHTML = `<i data-lucide="edit" class="w-4 h-4 mr-2"></i> บันทึกการแก้ไข`;
+                        document.getElementById('product-cancel-button').classList.remove('hidden');
+
+                        document.getElementById('product-name').value = productToEdit.name;
+                        document.getElementById('product-price').value = productToEdit.price;
+                        document.getElementById('product-description').value = productToEdit.description;
+                        document.getElementById('product-image').value = productToEdit.image;
+                        document.getElementById('product-sellerId').value = productToEdit.sellerId;
+                        document.getElementById('product-stock').value = productToEdit.stock;
+                        lucide.createIcons(); // Re-render Lucide icons for button change
+                    }
+                });
+            });
+
+            productListBody.querySelectorAll('.delete-product-button').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const productId = e.currentTarget.dataset.productId;
+                    if (window.confirm('คุณแน่ใจหรือไม่ที่ต้องการลบสินค้านี้?')) {
+                        products = products.filter(p => p.id !== productId);
+                        showCustomAlert('สินค้าถูกลบเรียบร้อยแล้ว!');
+                        populateProductList(); // Re-render the list
+                        renderHomePage(); // Update home page as well
+                    }
+                });
+            });
+        }
+
+        function setupProductFormEvents() {
+            const productForm = document.getElementById('product-form');
+            if (!productForm) return;
+
+            productForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const formData = {
+                    name: document.getElementById('product-name').value,
+                    price: parseFloat(document.getElementById('product-price').value),
+                    description: document.getElementById('product-description').value,
+                    image: document.getElementById('product-image').value,
+                    sellerId: document.getElementById('product-sellerId').value,
+                    stock: parseInt(document.getElementById('product-stock').value),
+                };
+
+                if (!formData.name || isNaN(formData.price) || formData.price < 0 || !formData.sellerId || isNaN(formData.stock) || formData.stock < 0) {
+                    showCustomAlert('กรุณากรอกข้อมูลสินค้าให้ครบถ้วนและถูกต้อง (ชื่อ, ราคา, ผู้ขาย, สต็อก)');
+                    return;
+                }
+
+                if (currentEditingProduct) {
+                    // Update existing product
+                    products = products.map(p => p.id === currentEditingProduct.id ? { ...p, ...formData } : p);
+                    showCustomAlert('สินค้าถูกแก้ไขเรียบร้อยแล้ว!');
+                } else {
+                    // Add new product
+                    const newProduct = {
+                        ...formData,
+                        id: `prod${Date.now()}`, // Simple unique ID
+                        rating: 0,
+                        reviews: 0,
+                        image: formData.image || `https://placehold.co/300x300/CCCCCC/333333?text=New+Product`
+                    };
+                    products.push(newProduct);
+                    showCustomAlert('สินค้าถูกเพิ่มเรียบร้อยแล้ว!');
+                }
+
+                // Reset form and editing state
+                currentEditingProduct = null;
+                productForm.reset();
+                document.getElementById('product-form-title').textContent = 'เพิ่มสินค้าใหม่';
+                document.getElementById('product-submit-button').innerHTML = `<i data-lucide="plus-circle" class="w-4 h-4 mr-2"></i> เพิ่มสินค้า`;
+                document.getElementById('product-cancel-button').classList.add('hidden');
+                lucide.createIcons(); // Re-render Lucide icons for button change
+
+                populateProductList(); // Re-render the list
+                renderHomePage(); // Update home page as well
+            });
+
+            document.getElementById('product-cancel-button').addEventListener('click', () => {
+                currentEditingProduct = null;
+                productForm.reset();
+                document.getElementById('product-form-title').textContent = 'เพิ่มสินค้าใหม่';
+                document.getElementById('product-submit-button').innerHTML = `<i data-lucide="plus-circle" class="w-4 h-4 mr-2"></i> เพิ่มสินค้า`;
+                document.getElementById('product-cancel-button').classList.add('hidden');
+                lucide.createIcons(); // Re-render Lucide icons for button change
+            });
+        }
+
+
+        function renderSellerManagement() {
+            const sellerManagementHtml = `
+                <div class="bg-white rounded-xl shadow-lg p-4 md:p-6 mb-8"> <!-- Changed p-6 md:p-8 to p-4 md:p-6 -->
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                        <i data-lucide="store" class="w-6 h-6 mr-2 text-blue-600"></i>
+                        จัดการผู้ขาย
+                    </h2>
+
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ผู้ขาย</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">สถานะ</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">การดำเนินการ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="seller-list-body" class="bg-white divide-y divide-gray-200">
+                                <!-- Seller rows will be inserted here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+            const sellerManagementContainer = document.createElement('div');
+            sellerManagementContainer.innerHTML = sellerManagementHtml;
+            return sellerManagementContainer;
+        }
+
+        function populateSellerList() {
+            const sellerListBody = document.getElementById('seller-list-body');
+            if (!sellerListBody) return;
+
+            sellerListBody.innerHTML = ''; // Clear existing rows
+
+            sellers.forEach(seller => {
+                const row = document.createElement('tr');
+                const statusClass = seller.status === 'active' ? 'bg-green-100 text-green-800' :
+                                    seller.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                                    'bg-red-100 text-red-800';
+                const statusText = seller.status === 'active' ? 'ใช้งาน' :
+                                   seller.status === 'pending' ? 'รอดำเนินการ' : 'ระงับ';
+
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 h-10 w-10">
+                                <img class="h-10 w-10 rounded-full object-cover" src="${seller.image}" alt="${seller.name}" onerror="this.onerror=null;this.src='https://placehold.co/40x40/CCCCCC/333333?text=Img';">
+                            </div>
+                            <div class="ml-4">
+                                <div class="text-sm font-medium text-gray-900">${seller.name}</div>
+                                <div class="text-sm text-gray-500">${seller.location}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${statusClass}">
+                            ${statusText}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        ${seller.status !== 'active' ? `
+                            <button data-seller-id="${seller.id}" data-status="active" class="change-seller-status-button text-green-600 hover:text-green-900 mr-3">
+                                <i data-lucide="check-circle" class="w-4.5 h-4.5"></i> อนุมัติ
+                            </button>
+                        ` : ''}
+                        ${seller.status !== 'suspended' ? `
+                            <button data-seller-id="${seller.id}" data-status="suspended" class="change-seller-status-button text-red-600 hover:text-red-900">
+                                <i data-lucide="x-circle" class="w-4.5 h-4.5"></i> ระงับ
+                            </button>
+                        ` : ''}
+                    </td>
+                `;
+                sellerListBody.appendChild(row);
+            });
+            lucide.createIcons(); // Re-render Lucide icons for new elements
+
+            // Add event listeners for status change buttons
+            sellerListBody.querySelectorAll('.change-seller-status-button').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const sellerId = e.currentTarget.dataset.sellerId;
+                    const newStatus = e.currentTarget.dataset.status;
+                    handleSellerStatusChange(sellerId, newStatus);
+                });
+            });
+        }
+
+        function handleSellerStatusChange(sellerId, newStatus) {
+            sellers = sellers.map(seller =>
+                seller.id === sellerId ? { ...seller, status: newStatus } : seller
+            );
+            showCustomAlert(`สถานะผู้ขาย ${getSellerById(sellerId).name} ถูกเปลี่ยนเป็น ${newStatus === 'active' ? 'ใช้งาน' : newStatus === 'pending' ? 'รอดำเนินการ' : 'ระงับ'} แล้ว!`);
+            populateSellerList(); // Re-render seller list
+            renderHomePage(); // Update home page as well (to reflect active sellers)
+        }
+
+        function renderOrderManagement() {
+            return `
+                <div class="bg-white rounded-xl shadow-lg p-4 md:p-6 mb-8"> <!-- Changed p-6 md:p-8 to p-4 md:p-6 -->
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                        <i data-lucide="shopping-cart" class="w-6 h-6 mr-2 text-blue-600"></i>
+                        จัดการคำสั่งซื้อ
+                    </h2>
+                    <p class="text-gray-700">
+                        หน้านี้จะแสดงรายการคำสั่งซื้อทั้งหมด สถานะการจัดส่ง และรายละเอียดการชำระเงิน
+                        ผู้ดูแลระบบสามารถอัปเดตสถานะคำสั่งซื้อ คืนเงิน หรือยกเลิกคำสั่งซื้อได้
+                    </p>
+                    <p class="mt-4 text-gray-500 text-sm">(ฟังก์ชันนี้ยังไม่สามารถใช้งานได้จริงในเวอร์ชันสาธิตนี้)</p>
+                </div>
+            `;
+        }
+
+        function renderReportsStatistics() {
+            return `
+                <div class="bg-white rounded-xl shadow-lg p-4 md:p-6 mb-8"> <!-- Changed p-6 md:p-8 to p-4 md:p-6 -->
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                        <i data-lucide="bar-chart-2" class="w-6 h-6 mr-2 text-blue-600"></i>
+                        รายงานและสถิติ
+                    </h2>
+                    <p class="text-gray-700">
+                        หน้านี้จะแสดงข้อมูลเชิงลึกเกี่ยวกับยอดขาย สินค้าที่ได้รับความนิยม ผู้ขายที่มีประสิทธิภาพ
+                        และข้อมูลอื่นๆ ที่เป็นประโยชน์สำหรับการตัดสินใจทางธุรกิจ
+                    </p>
+                    <p class="mt-4 text-gray-500 text-sm">(ฟังก์ชันนี้ยังไม่สามารถใช้งานได้จริงในเวอร์ชันสาธิตนี้)</p>
+                </div>
+            `;
+        }
+
+        function renderPromotionManagement() {
+            return `
+                <div class="bg-white rounded-xl shadow-lg p-4 md:p-6 mb-8"> <!-- Changed p-6 md:p-8 to p-4 md:p-6 -->
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                        <i data-lucide="gift" class="w-6 h-6 mr-2 text-blue-600"></i>
+                        จัดการโปรโมชันและส่วนลด
+                    </h2>
+                    <p class="text-gray-700">
+                        หน้านี้จะอนุญาตให้ผู้ดูแลระบบสร้าง จัดการ และติดตามแคมเปญโปรโมชัน
+                        เช่น โค้ดส่วนลด, แฟลชเซลล์, หรือโปรโมชันพิเศษต่างๆ
+                    </p>
+                    <p class="mt-4 text-gray-500 text-sm">(ฟังก์ชันนี้ยังไม่สามารถใช้งานได้จริงในเวอร์ชันสาธิตนี้)</p>
+                </div>
+            `;
+        }
+
+        function renderUserManagement() {
+            return `
+                <div class="bg-white rounded-xl shadow-lg p-4 md:p-6 mb-8"> <!-- Changed p-6 md:p-8 to p-4 md:p-6 -->
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                        <i data-lucide="users" class="w-6 h-6 mr-2 text-blue-600"></i>
+                        จัดการผู้ใช้งาน
+                    </h2>
+                    <p class="text-gray-700">
+                        หน้านี้จะแสดงรายชื่อผู้ใช้งานทั้งหมด รวมถึงข้อมูลโปรไฟล์ สิทธิ์การเข้าถึง
+                        และประวัติการทำธุรกรรม ผู้ดูแลระบบสามารถจัดการบัญชีผู้ใช้ได้
+                    </p>
+                    <p class="mt-4 text-gray-500 text-sm">(ฟังก์ชันนี้ยังไม่สามารถใช้งานได้จริงในเวอร์ชันสาธิตนี้)</p>
+                </div>
+            `;
+        }
+
+        function renderAdminPanel() {
+            mainContent.innerHTML = ''; // Clear previous content
+            let activeAdminTab = 'products'; // Default active tab for admin panel
+
+            const adminPanelHtml = `
+                <div class="p-4 md:p-8 bg-gray-50 min-h-screen flex flex-col lg:flex-row">
+                    <div class="lg:w-1/4 lg:pr-8 mb-6 lg:mb-0">
+                        <button id="back-from-admin-button" class="mb-4 flex items-center text-blue-600 hover:text-blue-800 transition duration-200">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+                            </svg>
+                            กลับหน้าหลัก
+                        </button>
+
+                        <h1 class="text-3xl font-bold text-gray-900 mb-6 flex items-center">
+                            <i data-lucide="settings" class="w-7 h-7 mr-3 text-gray-700"></i>
+                            แผงควบคุม
+                        </h1>
+
+                        <!-- Admin Sidebar Navigation -->
+                        <nav class="bg-white rounded-xl shadow-lg p-4">
+                            <ul class="space-y-2 admin-sidebar">
+                                <li>
+                                    <button data-tab="products" class="w-full text-left flex items-center p-3 rounded-lg transition duration-200">
+                                        <i data-lucide="package" class="w-5 h-5 mr-3"></i>
+                                        จัดการสินค้า
+                                    </button>
+                                </li>
+                                <li>
+                                    <button data-tab="sellers" class="w-full text-left flex items-center p-3 rounded-lg transition duration-200">
+                                        <i data-lucide="store" class="w-5 h-5 mr-3"></i>
+                                        จัดการผู้ขาย
+                                    </button>
+                                </li>
+                                <li>
+                                    <button data-tab="orders" class="w-full text-left flex items-center p-3 rounded-lg transition duration-200">
+                                        <i data-lucide="shopping-cart" class="w-5 h-5 mr-3"></i>
+                                        จัดการคำสั่งซื้อ
+                                    </button>
+                                </li>
+                                <li>
+                                    <button data-tab="reports" class="w-full text-left flex items-center p-3 rounded-lg transition duration-200">
+                                        <i data-lucide="bar-chart-2" class="w-5 h-5 mr-3"></i>
+                                        รายงานและสถิติ
+                                    </button>
+                                </li>
+                                <li>
+                                    <button data-tab="promotions" class="w-full text-left flex items-center p-3 rounded-lg transition duration-200">
+                                        <i data-lucide="gift" class="w-5 h-5 mr-3"></i>
+                                        จัดการโปรโมชัน
+                                    </button>
+                                </li>
+                                <li>
+                                    <button data-tab="users" class="w-full text-left flex items-center p-3 rounded-lg transition duration-200">
+                                        <i data-lucide="users" class="w-5 h-5 mr-3"></i>
+                                        จัดการผู้ใช้งาน
+                                    </button>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+
+                    <div id="admin-content-area" class="lg:w-3/4">
+                        <!-- Tab content will be rendered here -->
+                    </div>
+                </div>
+            `;
+            mainContent.innerHTML = adminPanelHtml;
+            lucide.createIcons(); // Re-render Lucide icons
+
+            // Setup event listeners for sidebar tabs
+            const adminContentArea = document.getElementById('admin-content-area');
+            const sidebarButtons = document.querySelectorAll('.admin-sidebar button');
+
+            function updateAdminTabContent(tabName) {
+                adminContentArea.innerHTML = ''; // Clear previous tab content
+                sidebarButtons.forEach(btn => btn.classList.remove('active')); // Remove active class from all buttons
+
+                let content;
+                switch (tabName) {
+                    case 'products':
+                        content = renderProductManagement();
+                        break;
+                    case 'sellers':
+                        content = renderSellerManagement();
+                        break;
+                    case 'orders':
+                        content = renderOrderManagement();
+                        break;
+                    case 'reports':
+                        content = renderReportsStatistics();
+                        break;
+                    case 'promotions':
+                        content = renderPromotionManagement();
+                        break;
+                    case 'users':
+                        content = renderUserManagement();
+                        break;
+                    default:
+                        content = `<p class="text-gray-700">เลือกเมนูเพื่อเริ่มต้นการจัดการ</p>`;
+                }
+                if (typeof content === 'string') {
+                    adminContentArea.innerHTML = content;
+                } else {
+                    adminContentArea.appendChild(content);
+                }
+
+                // Add active class to the clicked button
+                document.querySelector(`.admin-sidebar button[data-tab="${tabName}"]`).classList.add('active');
+
+                lucide.createIcons(); // Re-render Lucide icons for new tab content
+
+                // Specific setup for product/seller management after rendering
+                if (tabName === 'products') {
+                    populateProductList();
+                    setupProductFormEvents();
+                } else if (tabName === 'sellers') {
+                    populateSellerList();
+                }
+            }
+
+            sidebarButtons.forEach(button => {
+                button.addEventListener('click', (e) => {
+                    activeAdminTab = e.currentTarget.dataset.tab;
+                    updateAdminTabContent(activeAdminTab);
+                });
+            });
+
+            // Initial render of the default tab
+            updateAdminTabContent(activeAdminTab);
+
+            document.getElementById('back-from-admin-button').addEventListener('click', () => navigateTo('home'));
+        }
+
+        // --- Main Render Function ---
+        function renderPage() {
+            updateCartItemCount(); // Always update cart count
+            switch (currentPage) {
+                case 'home':
+                    renderHomePage();
+                    break;
+                case 'productDetail':
+                    renderProductDetailPage();
+                    break;
+                case 'cart':
+                    renderCartPage();
+                    break;
+                case 'adminPanel':
+                    renderAdminPanel();
+                    break;
+                default:
+                    renderHomePage();
+            }
+        }
+
+        // --- Event Listeners for Header Buttons ---
+        homeButton.addEventListener('click', () => navigateTo('home'));
+        cartButton.addEventListener('click', () => navigateTo('cart'));
+        
+        // Modified adminPanelButton event listener to show password modal
+        adminPanelButton.addEventListener('click', () => {
+            showPasswordModal();
+        });
+
+        searchInput.addEventListener('input', (e) => {
+            searchTerm = e.target.value;
+            if (currentPage === 'home') {
+                renderHomePage(); // Re-render home page with filtered results
+            }
+        });
+
+        // --- Initial App Load ---
+        document.addEventListener('DOMContentLoaded', () => {
+            renderPage();
+        });
+
+        // --- Cart Logic ---
+        function handleAddToCart(product) {
+            const existingItemIndex = cartItems.findIndex(item => item.id === product.id);
+            if (existingItemIndex > -1) {
+                cartItems[existingItemIndex].quantity += 1;
+            } else {
+                cartItems.push({ ...product, quantity: 1 });
+            }
+            showCustomAlert(`${product.name} ถูกเพิ่มลงในตะกร้าแล้ว!`);
+            updateCartItemCount();
+        }
+
+        function handleRemoveFromCart(productId) {
+            cartItems = cartItems.filter(item => item.id !== productId);
+            showCustomAlert('สินค้าถูกลบออกจากตะกร้าแล้ว!');
+            renderCartPage(); // Re-render cart page
+            updateCartItemCount();
+        }
+
+    </script>
+</body>
+</html>
