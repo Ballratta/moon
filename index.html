@@ -3,11 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Moon - เว็บขายสินค้า</title>
+    <title>Moon Delivery</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Font Inter -->
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+    <!-- Add Mali font -->
+    <link href="https://fonts.googleapis.com/css2?family=Mali&display=swap" rel="stylesheet">
     <!-- Lucide Icons CDN -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <!-- html2canvas CDN for generating image from HTML -->
@@ -16,13 +19,18 @@
         body {
             font-family: 'Inter', sans-serif;
             margin: 0;
-            background-color: #f3f4f6; /* bg-gray-100 */
+            background-color: #F3E6FF; /* Set body background to light purple as per image */
+        }
+        /* Custom font for Moon Delivery title and Free Shipping */
+        .moon-delivery-font {
+            font-family: 'Mali', cursive; /* Changed to Mali font */
         }
         /* Custom styles for better visual */
         .product-card-image {
             object-fit: cover;
             width: 100%;
-            height: 192px; /* h-48 */
+            height: 120px; /* Set fixed height for smaller product images */
+            /* Removed aspect-ratio to allow fixed height */
         }
         .product-detail-image {
             max-width: 100%;
@@ -146,9 +154,23 @@
             border-top: 1px solid #ddd;
             margin-top: 10px;
         }
+
+        /* New styles for category and store sections */
+        .category-item, .store-item {
+            flex-shrink: 0; /* Prevent items from shrinking */
+            width: 100px; /* Fixed width for category/store items */
+            text-align: center;
+        }
+        .category-item img, .store-item img {
+            width: 60px; /* Adjust size as needed */
+            height: 60px; /* Adjust size as needed */
+            object-fit: contain; /* Ensure image fits without cropping */
+            margin: 0 auto;
+            border-radius: 9999px; /* For circular images if desired */
+        }
     </style>
 </head>
-<body class="min-h-screen bg-gray-100 font-sans antialiased">
+<body class="min-h-screen bg-purple-100 font-sans antialiased">
 
     <!-- Custom Modal for Alerts -->
     <div id="custom-alert-modal" class="custom-modal-overlay">
@@ -177,23 +199,27 @@
     </div>
 
     <!-- Header -->
-    <header class="bg-white shadow-md p-4 sticky top-0 z-10">
-        <div class="container mx-auto flex flex-col md:flex-row items-center justify-between">
-            <div class="flex items-center mb-3 md:mb-0">
-                <button id="home-button" class="text-blue-600 hover:text-blue-800 transition duration-200">
-                    <i data-lucide="home" class="w-7 h-7 mr-2"></i>
-                </button>
-                <h1 class="text-2xl font-bold text-gray-800">
-                    <span class="text-blue-600">Moon</span>
+    <header class="bg-[#c8a1ffff] shadow-md p-4 sticky top-0 z-10"> <!-- Changed background color -->
+        <div class="container mx-auto flex items-center justify-between">
+            <!-- Left section: Moon Delivery Logo and Free Shipping -->
+            <div class="flex flex-col items-start">
+                <h1 class="text-4xl font-bold text-black moon-delivery-font"> <!-- Changed text color to black -->
+                    <span class="text-black">Moon</span> Delivery <!-- Changed text color to black -->
                 </h1>
+                <div class="flex items-center text-black font-semibold text-sm mt-1 moon-delivery-font"> <!-- Applied Mali font and changed text color to black -->
+                    <i data-lucide="truck" class="w-5 h-5 mr-1"></i>
+                    ส่งฟรีไม่มีขั้นต่ำ
+                </div>
             </div>
 
-            <div class="relative w-full md:w-1/2 lg:w-1/3 mb-3 md:mb-0">
+            <!-- Middle section: Search Input -->
+            <div class="flex-grow mx-4 relative max-w-md">
                 <input type="text" id="search-input" placeholder="ค้นหาสินค้า..."
                     class="w-full p-2 pl-10 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
                 <i data-lucide="search" class="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
             </div>
 
+            <!-- Right section: Cart and Admin buttons -->
             <div class="flex items-center space-x-4">
                 <button id="cart-button" class="relative bg-blue-500 text-white p-2 rounded-full hover:bg-blue-600 transition duration-200 shadow-md">
                     <i data-lucide="shopping-cart" class="w-6 h-6"></i>
@@ -201,24 +227,85 @@
                         0
                     </span>
                 </button>
-                <!-- Admin Management Link -->
                 <button id="admin-panel-button" class="text-gray-600 hover:text-blue-600 transition duration-200 font-semibold flex items-center" title="จัดการเว็บไซต์">
-                    <i data-lucide="settings" class="w-5 h-5"></i> <!-- Removed mr-1 and text -->
-                    : <!-- Only colon remains -->
+                    <i data-lucide="settings" class="w-5 h-5"></i>
                 </button>
             </div>
         </div>
     </header>
 
-    <!-- Main Content Area -->
-    <main id="main-content" class="container mx-auto p-4">
+    <!-- Category Navigation Bar -->
+    <nav class="bg-white shadow-sm p-4 mt-4 mx-auto max-w-7xl rounded-lg overflow-x-auto whitespace-nowrap">
+        <div class="flex space-x-6 justify-between md:justify-center">
+            <div class="category-item flex flex-col items-center cursor-pointer hover:text-blue-600 transition duration-200">
+                <img src="https://placehold.co/60x60/FFDDC1/FFFFFF?text=Beauty" alt="บิวตี้ช็อป" class="rounded-full mb-1">
+                <span class="text-sm">บิวตี้ช็อป</span>
+            </div>
+            <div class="category-item flex flex-col items-center cursor-pointer hover:text-blue-600 transition duration-200">
+                <img src="https://placehold.co/60x60/D1E7DD/FFFFFF?text=Home" alt="ของใช้" class="rounded-full mb-1">
+                <span class="text-sm">ของใช้</span>
+            </div>
+            <div class="category-item flex flex-col items-center cursor-pointer hover:text-blue-600 transition duration-200">
+                <img src="https://placehold.co/60x60/C2E0FF/FFFFFF?text=MomKid" alt="แม่และเด็ก" class="rounded-full mb-1">
+                <span class="text-sm">แม่และเด็ก</span>
+            </div>
+            <div class="category-item flex flex-col items-center cursor-pointer hover:text-blue-600 transition duration-200">
+                <img src="https://placehold.co/60x60/FFE0B2/FFFFFF?text=Toys" alt="ของเล่นเด็ก" class="rounded-full mb-1">
+                <span class="text-sm">ของเล่นเด็ก</span>
+            </div>
+            <div class="category-item flex flex-col items-center cursor-pointer hover:text-blue-600 transition duration-200">
+                <img src="https://placehold.co/60x60/E0BBE4/FFFFFF?text=Gifts" alt="กิฟต์ช็อป" class="rounded-full mb-1">
+                <span class="text-sm">กิฟต์ช็อป</span>
+            </div>
+            <!-- Add more categories as needed -->
+        </div>
+    </nav>
+
+    <!-- Participating Stores Section -->
+    <section class="container mx-auto p-4 mt-6">
+        <h2 class="text-xl font-bold text-gray-800 mb-4">ร้านที่ร่วมรายการ</h2>
+        <div class="rounded-xl shadow-md p-4 overflow-x-auto whitespace-nowrap">
+            <div class="flex space-x-4">
+                <div class="store-item flex flex-col items-center cursor-pointer hover:opacity-75 transition duration-200">
+                    <img src="https://placehold.co/80x80/B3E0FF/FFFFFF?text=Store1" alt="Store 1" class="rounded-lg mb-1">
+                    <span class="text-xs text-gray-700">Store Name 1</span>
+                </div>
+                <div class="store-item flex flex-col items-center cursor-pointer hover:opacity-75 transition duration-200">
+                    <img src="https://placehold.co/80x80/FFB3BA/FFFFFF?text=Store2" alt="Store 2" class="rounded-lg mb-1">
+                    <span class="text-xs text-gray-700">Store Name 2</span>
+                </div>
+                <div class="store-item flex flex-col items-center cursor-pointer hover:opacity-75 transition duration-200">
+                    <img src="https://placehold.co/80x80/BAFFC9/FFFFFF?text=Store3" alt="Store 3" class="rounded-lg mb-1">
+                    <span class="text-xs text-gray-700">Store Name 3</span>
+                </div>
+                <div class="store-item flex flex-col items-center cursor-pointer hover:opacity-75 transition duration-200">
+                    <img src="https://placehold.co/80x80/FFFFB3/FFFFFF?text=Store4" alt="Store 4" class="rounded-lg mb-1">
+                    <span class="text-xs text-gray-700">Store Name 4</span>
+                </div>
+                <div class="store-item flex flex-col items-center cursor-pointer hover:opacity-75 transition duration-200">
+                    <img src="https://placehold.co/80x80/E0BBE4/FFFFFF?text=Store5" alt="Store 5" class="rounded-lg mb-1">
+                    <span class="text-xs text-gray-700">Store Name 5</span>
+                </div>
+                <div class="store-item flex flex-col items-center cursor-pointer hover:opacity-75 transition duration-200">
+                    <img src="https://placehold.co/80x80/FFDDC1/FFFFFF?text=Store6" alt="Store 6" class="rounded-lg mb-1">
+                    <span class="text-xs text-gray-700">Store Name 6</span>
+                </div>
+                <!-- Add more store items as needed -->
+            </div>
+        </div>
+    </section>
+
+
+    <!-- Main Content Area (Recommended Products) -->
+    <main id="main-content" class="container mx-auto p-4 mt-6">
+        <h2 class="text-xl font-bold text-gray-800 mb-4">สินค้าแนะนำ</h2>
         <!-- Content will be rendered here by JavaScript -->
     </main>
 
     <!-- Footer -->
     <footer class="bg-gray-800 text-white p-6 mt-8">
         <div class="container mx-auto text-center text-sm">
-            <p>&copy; 2023 Moon Clone. สงวนลิขสิทธิ์.</p>
+            <p>&copy; 2023 Moon Delivery. สงวนลิขสิทธิ์.</p>
             <p class="mt-2">สร้างขึ้นเพื่อการสาธิตเท่านั้น</p>
         </div>
     </footer>
@@ -226,7 +313,6 @@
     <!-- Hidden Receipt Container (for image generation) -->
     <div id="receipt-container">
         <!-- Receipt content will be dynamically generated here -->
-         
     </div>
 
     <script>
@@ -239,30 +325,19 @@
         let cartItems = [];
         let searchTerm = '';
         let currentEditingProduct = null; // To store product being edited
+        let currentEditingSeller = null; // To store seller being edited
 
-        // Mock Data (will not persist on page refresh)
-        let products = [
-            { id: 'prod1', name: 'สมาร์ทโฟนรุ่นใหม่ล่าสุด', description: 'สมาร์ทโฟนประสิทธิภาพสูง กล้องคมชัด แบตเตอรี่ทนทาน', price: 15999, image: 'https://placehold.co/300x300/ADD8E6/FFFFFF?text=Smartphone', sellerId: 'seller1', rating: 4.8, reviews: 120, stock: 50 },
-            { id: 'prod2', name: 'หูฟังไร้สายพรีเมียม', description: 'หูฟังตัดเสียงรบกวน เสียงใส เบสแน่น', price: 2499, image: 'https://placehold.co/300x300/90EE90/FFFFFF?text=Headphones', sellerId: 'seller1', rating: 4.5, reviews: 85, stock: 100 },
-            { id: 'prod3', name: 'เสื้อยืดโอเวอร์ไซส์', description: 'เสื้อยืดผ้าคอตตอน 100% สวมใส่สบาย สไตล์มินิมอล', price: 399, image: 'https://placehold.co/300x300/FFB6C1/FFFFFF?text=T-Shirt', sellerId: 'seller2', rating: 4.2, reviews: 200, stock: 300 },
-            { id: 'prod4', name: 'กางเกงยีนส์เดนิม', description: 'กางเกงยีนส์ทรงกระบอกเล็ก ดีไซน์คลาสสิก', price: 899, image: 'https://placehold.co/300x300/FFDAB9/FFFFFF?text=Jeans', sellerId: 'seller2', rating: 4.6, reviews: 150, stock: 120 },
-            { id: 'prod5', name: 'ชุดเครื่องนอนผ้าฝ้าย', description: 'ชุดเครื่องนอนนุ่มสบาย ระบายอากาศได้ดี', price: 1890, image: 'https://placehold.co/300x300/ADD8E6/FFFFFF?text=Bedding', sellerId: 'seller3', rating: 4.7, reviews: 90, stock: 70 },
-            { id: 'prod6', name: 'โคมไฟตั้งโต๊ะมินิมอล', description: 'โคมไฟดีไซน์เรียบง่าย ให้แสงสว่างอบอุ่น', price: 650, image: 'https://placehold.co/300x300/D8BFD8/FFFFFF?text=Lamp', sellerId: 'seller3', rating: 4.3, reviews: 60, stock: 80 },
-        ];
-
-        let sellers = [
-            { id: 'seller1', name: 'Gadget Galaxy', description: 'ร้านค้าอุปกรณ์อิเล็กทรอนิกส์และแกดเจ็ตสุดล้ำ', image: 'https://placehold.co/100x100/AEC6CF/FFFFFF?text=Seller1', location: 'กรุงเทพมหานคร', contact: '081-123-4567', status: 'active' },
-            { id: 'seller2', name: 'Fashion Forward', description: 'เสื้อผ้าแฟชั่นทันสมัยสำหรับทุกสไตล์', image: 'https://placehold.co/100x100/FFDDC1/FFFFFF?text=Seller2', location: 'เชียงใหม่', contact: '089-765-4321', status: 'active' },
-            { id: 'seller3', name: 'Home Comforts', description: 'ของใช้ในบ้านคุณภาพดีเพื่อความสุขของคุณ', image: 'https://placehold.co/100x100/D4EDDA/FFFFFF?text=Seller3', location: 'ภูเก็ต', contact: '092-345-6789', status: 'pending' },
-        ];
+        // Mock Data (will not persist on page refresh) - This will be replaced by API calls
+        let products = []; // Initialize as empty, data will come from API
+        let sellers = []; // Initialize as empty, data will come from API
 
         // --- DOM Elements ---
         const mainContent = document.getElementById('main-content');
         const cartItemCountSpan = document.getElementById('cart-item-count');
         const searchInput = document.getElementById('search-input');
-        const homeButton = document.getElementById('home-button');
         const cartButton = document.getElementById('cart-button');
         const adminPanelButton = document.getElementById('admin-panel-button');
+
 
         // --- Custom Alert/Message Box ---
         const customAlertModal = document.getElementById('custom-alert-modal');
@@ -316,10 +391,14 @@
             }
         });
 
+        // --- API Base URLs ---
+        const API_BASE_URL = 'http://localhost/my_ecommerce_api'; // Base URL for your PHP API
+        const PRODUCTS_API_URL = `${API_BASE_URL}/products.php`;
+        const SELLERS_API_URL = `${API_BASE_URL}/sellers.php`; // New API URL for sellers
 
         // --- Helper Functions ---
         function getSellerById(sellerId) {
-            return sellers.find(seller => seller.id === sellerId);
+            return sellers.find(seller => seller.id == sellerId); // Use == for loose comparison
         }
 
         function updateCartItemCount() {
@@ -338,22 +417,67 @@
             renderPage();
         }
 
+        // --- Fetch Data from APIs ---
+        async function fetchProductsFromAPI() {
+            console.log('Fetching products from:', PRODUCTS_API_URL);
+            try {
+                const response = await fetch(PRODUCTS_API_URL);
+                console.log('Products API response status:', response.status);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                console.log('Products fetched:', data);
+                return data;
+            } catch (error) {
+                console.error('Error fetching products from API:', error);
+                showCustomAlert('ไม่สามารถดึงข้อมูลสินค้าได้: ' + error.message);
+                return [];
+            }
+        }
+
+        async function fetchSellersFromAPI() {
+            console.log('Fetching sellers from:', SELLERS_API_URL);
+            try {
+                const response = await fetch(SELLERS_API_URL);
+                console.log('Sellers API response status:', response.status);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                console.log('Sellers fetched:', data);
+                return data;
+            } catch (error) {
+                console.error('Error fetching sellers from API:', error);
+                showCustomAlert('ไม่สามารถดึงข้อมูลผู้ขายได้: ' + error.message);
+                return [];
+            }
+        }
+
         // --- Render Functions for Pages ---
 
-        function renderHomePage() {
-            mainContent.innerHTML = ''; // Clear previous content
+        async function renderHomePage() {
+            mainContent.innerHTML = '';
+
+            const allProducts = await fetchProductsFromAPI();
+            products = allProducts; // Update global products array
+
+            // Fetch sellers to ensure dropdown is populated correctly for filtering
+            const allSellers = await fetchSellersFromAPI();
+            sellers = allSellers; // Update global sellers array
+
             const activeSellerIds = sellers.filter(s => s.status === 'active').map(s => s.id);
 
             const filteredProducts = products.filter(product =>
-                activeSellerIds.includes(product.sellerId) &&
+                activeSellerIds.includes(product.seller_id) &&
                 (product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 product.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                getSellerById(product.sellerId)?.name.toLowerCase().includes(searchTerm.toLowerCase()))
+                getSellerById(product.seller_id)?.name.toLowerCase().includes(searchTerm.toLowerCase()))
             );
 
             const productGrid = document.createElement('div');
-            // Changed gap-6 to gap-4
-            productGrid.className = 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4';
+            // Changed grid columns to 6 for large screens to match the new design density
+            productGrid.className = 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 lg:grid-cols-8 gap-4'; /* Adjusted grid columns */
 
             if (filteredProducts.length === 0) {
                 productGrid.innerHTML = `
@@ -363,55 +487,68 @@
                 `;
             } else {
                 filteredProducts.forEach(product => {
-                    const seller = getSellerById(product.sellerId);
+                    // const seller = getSellerById(product.seller_id); // Seller info removed from product card
                     const productCard = document.createElement('div');
                     productCard.className = 'bg-white rounded-xl shadow-md overflow-hidden transform transition duration-300 hover:scale-105 hover:shadow-lg cursor-pointer flex flex-col';
-                    productCard.dataset.productId = product.id; // Store product ID
+                    productCard.dataset.productId = product.id;
 
                     productCard.innerHTML = `
-                        <img src="${product.image}" alt="${product.name}" class="product-card-image rounded-t-xl" onerror="this.onerror=null;this.src='https://placehold.co/300x300/CCCCCC/333333?text=Image+Error';">
-                        <div class="p-3 flex-grow flex flex-col justify-between"> <!-- Changed p-4 to p-3 -->
+                        <img src="${product.image_url}" alt="${product.name}" class="product-card-image rounded-t-xl" onerror="this.onerror=null;this.src='https://placehold.co/300x300/CCCCCC/333333?text=Image+Error';">
+                        <div class="p-2 flex-grow flex flex-col justify-between">
                             <div>
-                                <h3 class="text-lg font-semibold text-gray-800 mb-1 line-clamp-2">${product.name}</h3>
-                                <p class="text-sm text-gray-600 mb-2 flex items-center">
-                                    <i data-lucide="store" class="w-3.5 h-3.5 mr-1 text-blue-500"></i>
-                                    ${seller ? seller.name : 'ไม่ระบุผู้ขาย'}
-                                </p>
-                                <div class="flex items-center mb-2">
-                                    <i data-lucide="star" class="w-4 h-4 text-yellow-400 mr-1" fill="currentColor"></i>
-                                    <span class="text-sm text-gray-700">${product.rating.toFixed(1)} (${product.reviews} รีวิว)</span>
-                                </div>
-                                <p class="text-xl font-bold text-red-600 mb-3">฿${product.price.toLocaleString()}</p>
+                                <h3 class="text-sm font-semibold text-gray-800 mb-1 line-clamp-2">${product.name}</h3>
+                                <!-- Removed seller, rating, reviews from product card to match new design -->
                             </div>
-                            <button class="add-to-cart-button w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-200 shadow-md">
-                                เพิ่มลงตะกร้า
-                            </button>
+                            <div class="flex justify-between items-end mt-2">
+                                <p class="text-lg font-bold text-red-600">฿${parseFloat(product.price).toLocaleString()}</p>
+                                <button class="add-to-cart-button bg-blue-600 text-white p-1 rounded-full hover:bg-blue-700 transition duration-200">
+                                    <i data-lucide="plus" class="w-4 h-4"></i>
+                                </button>
+                            </div>
                         </div>
                     `;
                     productGrid.appendChild(productCard);
 
-                    // Add event listener for product card click
                     productCard.addEventListener('click', (e) => {
-                        if (!e.target.classList.contains('add-to-cart-button')) {
+                        // Only navigate to product detail if the click is not on the add to cart button
+                        if (!e.target.closest('.add-to-cart-button')) {
                             navigateTo('productDetail', product.id);
                         }
                     });
 
-                    // Add event listener for add to cart button
                     productCard.querySelector('.add-to-cart-button').addEventListener('click', (e) => {
-                        e.stopPropagation(); // Prevent card click from firing
+                        e.stopPropagation(); // Prevent the parent card's click event from firing
                         handleAddToCart(product);
                     });
                 });
             }
             mainContent.appendChild(productGrid);
-            lucide.createIcons(); // Re-render Lucide icons for new elements
+            lucide.createIcons();
         }
 
-        function renderProductDetailPage() {
-            mainContent.innerHTML = ''; // Clear previous content
-            const product = products.find(p => p.id === selectedProductId);
-            const seller = product ? getSellerById(product.sellerId) : null;
+        async function renderProductDetailPage() {
+            mainContent.innerHTML = '';
+            let product = null;
+
+            if (selectedProductId) {
+                try {
+                    const response = await fetch(`${PRODUCTS_API_URL}?id=${selectedProductId}`);
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    const data = await response.json();
+                    if (data.length > 0) {
+                        product = data[0];
+                        product.price = parseFloat(product.price);
+                        product.rating = parseFloat(product.rating);
+                        product.reviews = parseInt(product.reviews);
+                        product.stock = parseInt(product.stock);
+                    }
+                } catch (error) {
+                    console.error('Error fetching product detail:', error);
+                    showCustomAlert('ไม่สามารถดึงรายละเอียดสินค้าได้: ' + error.message);
+                }
+            }
 
             if (!product) {
                 mainContent.innerHTML = `
@@ -426,6 +563,8 @@
                 return;
             }
 
+            const seller = getSellerById(product.seller_id);
+
             const detailPageHtml = `
                 <button id="back-to-shopping-button" class="mb-4 flex items-center text-blue-600 hover:text-blue-800 transition duration-200">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
@@ -436,7 +575,7 @@
 
                 <div class="bg-white rounded-xl shadow-lg p-6 md:p-8 flex flex-col md:flex-row gap-6 md:gap-8">
                     <div class="md:w-1/2 flex justify-center items-center">
-                        <img src="${product.image}" alt="${product.name}" class="product-detail-image" onerror="this.onerror=null;this.src='https://placehold.co/400x400/CCCCCC/333333?text=Image+Error';">
+                        <img src="${product.image_url}" alt="${product.name}" class="product-detail-image" onerror="this.onerror=null;this.src='https://placehold.co/400x400/CCCCCC/333333?text=Image+Error';">
                     </div>
                     <div class="md:w-1/2">
                         <h1 class="text-3xl font-bold text-gray-900 mb-3">${product.name}</h1>
@@ -479,14 +618,14 @@
                 </div>
             `;
             mainContent.innerHTML = detailPageHtml;
-            lucide.createIcons(); // Re-render Lucide icons
+            lucide.createIcons();
 
             document.getElementById('back-to-shopping-button').addEventListener('click', () => navigateTo('home'));
             document.getElementById('detail-add-to-cart-button').addEventListener('click', () => handleAddToCart(product));
         }
 
         function renderCartPage() {
-            mainContent.innerHTML = ''; // Clear previous content
+            mainContent.innerHTML = '';
             const total = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
             let cartHtml = `
@@ -635,56 +774,69 @@
         // --- Admin Panel Sub-Components Render Functions ---
 
         function renderProductManagement() {
-           
-            let productFormHtml = `
-                <div class="bg-white rounded-xl shadow-lg p-4 md:p-6 mb-8"> <!-- Changed p-6 md:p-8 to p-4 md:p-6 -->
+            let productManagementHtml = `
+                <div class="bg-white rounded-xl shadow-lg p-4 md:p-6 mb-8">
                     <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
                         <i data-lucide="package" class="w-6 h-6 mr-2 text-blue-600"></i>
                         จัดการสินค้า
                     </h2>
 
                     <!-- Product Add/Edit Form -->
-                    <form id="product-form" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8 p-4 border border-gray-200 rounded-lg bg-gray-50">
-                        <div class="md:col-span-2">
-                            <h3 id="product-form-title" class="text-xl font-semibold text-gray-800 mb-4">เพิ่มสินค้าใหม่</h3>
-                        </div>
-                        <div>
-                            <label for="product-name" class="block text-sm font-medium text-gray-700">ชื่อสินค้า</label>
-                            <input type="text" id="product-name" name="name" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2" required>
-                        </div>
-                        <div>
-                            <label for="product-price" class="block text-sm font-medium text-gray-700">ราคา (฿)</label>
-                            <input type="number" id="product-price" name="price" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2" min="0" step="0.01" required>
-                        </div>
-                        <div class="md:col-span-2">
-                            <label for="product-description" class="block text-sm font-medium text-gray-700">คำอธิบาย</label>
-                            <textarea id="product-description" name="description" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2"></textarea>
-                        </div>
-                        <div>
-                            <label for="product-image" class="block text-sm font-medium text-gray-700">URL รูปภาพ</label>
-                            <input type="text" id="product-image" name="image" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2" placeholder="https://...">
-                        </div>
-                        <div>
-                            <label for="product-sellerId" class="block text-sm font-medium text-gray-700">ผู้ขาย</label>
-                            <select id="product-sellerId" name="sellerId" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2" required>
-                                <option value="">เลือกผู้ขาย</option>
-                                ${sellers.map(seller => `<option value="${seller.id}">${seller.name}</option>`).join('')}
-                            </select>
-                        </div>
-                        <div>
-                            <label for="product-stock" class="block text-sm font-medium text-gray-700">สต็อก</label>
-                            <input type="number" id="product-stock" name="stock" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2" min="0" required>
-                        </div>
-                        <div class="md:col-span-2 flex justify-end space-x-3">
-                            <button type="submit" id="product-submit-button" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                                <i data-lucide="plus-circle" class="w-4 h-4 mr-2"></i>
-                                เพิ่มสินค้า
-                            </button>
-                            <button type="button" id="product-cancel-button" class="hidden inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                                ยกเลิก
-                            </button>
-                        </div>
-                    </form>
+                    <div id="product-form-container" class="bg-gray-50 p-4 border border-gray-200 rounded-lg mb-8">
+                        <form id="add-edit-product-form" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <input type="hidden" id="product-id"> <!-- Hidden input for product ID -->
+                            <div class="md:col-span-2">
+                                <h3 id="product-form-title" class="text-xl font-semibold text-gray-800 mb-4">เพิ่มสินค้าใหม่</h3>
+                            </div>
+                            <div>
+                                <label for="product-name" class="block text-sm font-medium text-gray-700">ชื่อสินค้า</label>
+                                <input type="text" id="product-name" name="name" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2" required>
+                            </div>
+                            <div>
+                                <label for="product-price" class="block text-sm font-medium text-gray-700">ราคา (฿)</label>
+                                <input type="number" id="product-price" name="price" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2" min="0" step="0.01" required>
+                            </div>
+                            <div class="md:col-span-2">
+                                <label for="product-description" class="block text-sm font-medium text-gray-700">คำอธิบาย</label>
+                                <textarea id="product-description" name="description" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2"></textarea>
+                            </div>
+                            <div>
+                                <label for="product-image" class="block text-sm font-medium text-gray-700">URL รูปภาพ</label>
+                                <input type="text" id="product-image" name="image" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2" placeholder="https://..." required>
+                            </div>
+                            <div>
+                                <label for="product-seller-id" class="block text-sm font-medium text-gray-700">ผู้ขาย</label>
+                                <select id="product-seller-id" name="sellerId" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2" required>
+                                    <!-- Options will be populated by JavaScript -->
+                                </select>
+                            </div>
+                            <div>
+                                <label for="product-rating" class="block text-sm font-medium text-gray-700">เรตติ้ง (0.0-5.0)</label>
+                                <input type="number" id="product-rating" name="rating" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2" min="0" max="5" step="0.1" value="0.0">
+                            </div>
+                            <div>
+                                <label for="product-reviews" class="block text-sm font-medium text-gray-700">จำนวนรีวิว</label>
+                                <input type="number" id="product-reviews" name="reviews" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2" min="0" value="0">
+                            </div>
+                            <div>
+                                <label for="product-stock" class="block text-sm font-medium text-gray-700">สต็อก</label>
+                                <input type="number" id="product-stock" name="stock" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2" min="0" required>
+                            </div>
+                            <div class="md:col-span-2 flex justify-end space-x-3">
+                                <button type="submit" id="submit-product-button" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                    <i data-lucide="plus-circle" class="w-4 h-4 mr-2"></i>
+                                    เพิ่มสินค้า
+                                </button>
+                                <button type="button" id="cancel-product-form" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                    ยกเลิก
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <button id="show-product-form-button" class="mb-6 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 hidden">
+                        <i data-lucide="plus" class="w-4 h-4 mr-2"></i> เพิ่มสินค้าใหม่
+                    </button>
 
                     <!-- Product List -->
                     <h3 class="text-xl font-semibold text-gray-800 mb-4">รายการสินค้าทั้งหมด</h3>
@@ -692,10 +844,14 @@
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead class="bg-gray-50">
                                 <tr>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">รูปภาพ</th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">สินค้า</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ผู้ขาย</th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ราคา</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ผู้ขาย</th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">สต็อก</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">เรตติ้ง</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">รีวิว</th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">การดำเนินการ</th>
                                 </tr>
                             </thead>
@@ -706,163 +862,290 @@
                     </div>
                 </div>
             `;
-            // This is a temporary container for the product management section.
-            // In renderAdminPanel, we will append this to the main content.
             const productManagementContainer = document.createElement('div');
-            productManagementContainer.innerHTML = productFormHtml;
-
-            // Append to the main content area (or a specific tab content area)
-            // For now, assume it's appended to a div that will be inserted into mainContent
+            productManagementContainer.innerHTML = productManagementHtml;
             return productManagementContainer;
         }
 
-        function populateProductList() {
+        async function populateProductList() {
             const productListBody = document.getElementById('product-list-body');
-            if (!productListBody) return; // Ensure element exists
+            if (!productListBody) return;
 
-            productListBody.innerHTML = ''; // Clear existing rows
+            try {
+                const allProducts = await fetchProductsFromAPI();
+                products = allProducts; // Update global products array
 
-            products.forEach(product => {
-                const seller = getSellerById(product.sellerId);
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0 h-10 w-10">
-                                <img class="h-10 w-10 rounded-full object-cover" src="${product.image}" alt="${product.name}" onerror="this.onerror=null;this.src='https://placehold.co/40x40/CCCCCC/333333?text=Img';">
-                            </div>
-                            <div class="ml-4">
-                                <div class="text-sm font-medium text-gray-900">${product.name}</div>
-                                <div class="text-sm text-gray-500 line-clamp-1">${product.description}</div>
-                            </div>
-                        </div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        ${seller ? seller.name : 'ไม่ระบุ'}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">฿${product.price.toLocaleString()}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${product.stock}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <button data-product-id="${product.id}" class="edit-product-button text-indigo-600 hover:text-indigo-900 mr-3">
-                            <i data-lucide="edit" class="w-4.5 h-4.5"></i>
-                        </button>
-                        <button data-product-id="${product.id}" class="delete-product-button text-red-600 hover:text-red-900">
-                            <i data-lucide="trash-2" class="w-4.5 h-4.5"></i>
-                        </button>
-                    </td>
-                `;
-                productListBody.appendChild(row);
-            });
-            lucide.createIcons(); // Re-render Lucide icons for new elements
+                // Also fetch sellers to ensure the seller dropdown is up-to-date
+                const allSellers = await fetchSellersFromAPI();
+                sellers = allSellers;
 
-            // Add event listeners for edit and delete buttons
-            productListBody.querySelectorAll('.edit-product-button').forEach(button => {
-                button.addEventListener('click', (e) => {
-                    const productId = e.currentTarget.dataset.productId;
-                    const productToEdit = products.find(p => p.id === productId);
-                    if (productToEdit) {
-                        currentEditingProduct = productToEdit;
-                        document.getElementById('product-form-title').textContent = 'แก้ไขสินค้า';
-                        document.getElementById('product-submit-button').innerHTML = `<i data-lucide="edit" class="w-4 h-4 mr-2"></i> บันทึกการแก้ไข`;
-                        document.getElementById('product-cancel-button').classList.remove('hidden');
+                productListBody.innerHTML = ''; // Clear existing rows
 
-                        document.getElementById('product-name').value = productToEdit.name;
-                        document.getElementById('product-price').value = productToEdit.price;
-                        document.getElementById('product-description').value = productToEdit.description;
-                        document.getElementById('product-image').value = productToEdit.image;
-                        document.getElementById('product-sellerId').value = productToEdit.sellerId;
-                        document.getElementById('product-stock').value = productToEdit.stock;
-                        lucide.createIcons(); // Re-render Lucide icons for button change
-                    }
-                });
-            });
-
-            productListBody.querySelectorAll('.delete-product-button').forEach(button => {
-                button.addEventListener('click', (e) => {
-                    const productId = e.currentTarget.dataset.productId;
-                    if (window.confirm('คุณแน่ใจหรือไม่ที่ต้องการลบสินค้านี้?')) {
-                        products = products.filter(p => p.id !== productId);
-                        showCustomAlert('สินค้าถูกลบเรียบร้อยแล้ว!');
-                        populateProductList(); // Re-render the list
-                        renderHomePage(); // Update home page as well
-                    }
-                });
-            });
-        }
-
-        function setupProductFormEvents() {
-            const productForm = document.getElementById('product-form');
-            if (!productForm) return;
-
-            productForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                const formData = {
-                    name: document.getElementById('product-name').value,
-                    price: parseFloat(document.getElementById('product-price').value),
-                    description: document.getElementById('product-description').value,
-                    image: document.getElementById('product-image').value,
-                    sellerId: document.getElementById('product-sellerId').value,
-                    stock: parseInt(document.getElementById('product-stock').value),
-                };
-
-                if (!formData.name || isNaN(formData.price) || formData.price < 0 || !formData.sellerId || isNaN(formData.stock) || formData.stock < 0) {
-                    showCustomAlert('กรุณากรอกข้อมูลสินค้าให้ครบถ้วนและถูกต้อง (ชื่อ, ราคา, ผู้ขาย, สต็อก)');
+                if (products.length === 0) {
+                    productListBody.innerHTML = `<tr><td colspan="9" class="py-4 text-center text-gray-500">ไม่มีสินค้าในระบบ.</td></tr>`;
                     return;
                 }
 
-                if (currentEditingProduct) {
-                    // Update existing product
-                    products = products.map(p => p.id === currentEditingProduct.id ? { ...p, ...formData } : p);
-                    showCustomAlert('สินค้าถูกแก้ไขเรียบร้อยแล้ว!');
-                } else {
-                    // Add new product
-                    const newProduct = {
-                        ...formData,
-                        id: `prod${Date.now()}`, // Simple unique ID
-                        rating: 0,
-                        reviews: 0,
-                        image: formData.image || `https://placehold.co/300x300/CCCCCC/333333?text=New+Product`
-                    };
-                    products.push(newProduct);
-                    showCustomAlert('สินค้าถูกเพิ่มเรียบร้อยแล้ว!');
-                }
+                products.forEach(product => {
+                    const seller = getSellerById(product.seller_id);
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${product.id}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <img class="h-10 w-10 rounded-full object-cover" src="${product.image_url}" alt="${product.name}" onerror="this.onerror=null;this.src='https://placehold.co/40x40/CCCCCC/333333?text=Img';">
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm font-medium text-gray-900">${product.name}</div>
+                            <div class="text-sm text-gray-500 line-clamp-1">${product.description}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">฿${parseFloat(product.price).toLocaleString()}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            ${seller ? seller.name : 'ไม่ระบุ'}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${product.stock}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${parseFloat(product.rating).toFixed(1)}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${product.reviews}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <button data-product-id="${product.id}" class="edit-product-button text-indigo-600 hover:text-indigo-900 mr-3">
+                                <i data-lucide="edit" class="w-4.5 h-4.5"></i>
+                            </button>
+                            <button data-product-id="${product.id}" class="delete-product-button text-red-600 hover:text-red-900">
+                                <i data-lucide="trash-2" class="w-4.5 h-4.5"></i>
+                            </button>
+                        </td>
+                    `;
+                    productListBody.appendChild(row);
+                });
+                lucide.createIcons();
 
-                // Reset form and editing state
-                currentEditingProduct = null;
-                productForm.reset();
-                document.getElementById('product-form-title').textContent = 'เพิ่มสินค้าใหม่';
-                document.getElementById('product-submit-button').innerHTML = `<i data-lucide="plus-circle" class="w-4 h-4 mr-2"></i> เพิ่มสินค้า`;
-                document.getElementById('product-cancel-button').classList.add('hidden');
-                lucide.createIcons(); // Re-render Lucide icons for button change
+                // Add event listeners for edit and delete buttons
+                productListBody.querySelectorAll('.edit-product-button').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        const productId = e.currentTarget.dataset.productId;
+                        const productToEdit = products.find(p => p.id == productId);
+                        if (productToEdit) {
+                            currentEditingProduct = productToEdit;
+                            document.getElementById('product-id').value = productToEdit.id;
+                            document.getElementById('product-name').value = productToEdit.name;
+                            document.getElementById('product-description').value = productToEdit.description;
+                            document.getElementById('product-price').value = productToEdit.price;
+                            document.getElementById('product-image').value = productToEdit.image_url;
+                            document.getElementById('product-seller-id').value = productToEdit.seller_id;
+                            document.getElementById('product-rating').value = productToEdit.rating;
+                            document.getElementById('product-reviews').value = productToEdit.reviews;
+                            document.getElementById('product-stock').value = productToEdit.stock;
 
-                populateProductList(); // Re-render the list
-                renderHomePage(); // Update home page as well
-            });
+                            document.getElementById('product-form-title').textContent = 'แก้ไขสินค้า';
+                            document.getElementById('submit-product-button').innerHTML = `<i data-lucide="edit" class="w-4 h-4 mr-2"></i> บันทึกการแก้ไข`;
+                            document.getElementById('product-form-container').classList.remove('hidden');
+                            lucide.createIcons();
+                        }
+                    });
+                });
 
-            document.getElementById('product-cancel-button').addEventListener('click', () => {
-                currentEditingProduct = null;
-                productForm.reset();
-                document.getElementById('product-form-title').textContent = 'เพิ่มสินค้าใหม่';
-                document.getElementById('product-submit-button').innerHTML = `<i data-lucide="plus-circle" class="w-4 h-4 mr-2"></i> เพิ่มสินค้า`;
-                document.getElementById('product-cancel-button').classList.add('hidden');
-                lucide.createIcons(); // Re-render Lucide icons for button change
-            });
+                productListBody.querySelectorAll('.delete-product-button').forEach(button => {
+                    button.addEventListener('click', async (e) => {
+                        const productId = e.currentTarget.dataset.productId;
+                        if (confirm('คุณแน่ใจหรือไม่ที่ต้องการลบสินค้านี้?')) {
+                            try {
+                                const response = await fetch(`${PRODUCTS_API_URL}?id=${productId}`, {
+                                    method: 'DELETE'
+                                });
+                                const result = await response.json();
+                                if (response.ok && result.message === "Product deleted successfully") {
+                                    showCustomAlert('สินค้าถูกลบเรียบร้อยแล้ว!');
+                                    await populateProductList();
+                                } else {
+                                    throw new Error(result.message || 'เกิดข้อผิดพลาดในการลบสินค้า');
+                                }
+                            } catch (error) {
+                                console.error('Error deleting product:', error);
+                                showCustomAlert('ลบสินค้าไม่สำเร็จ: ' + error.message);
+                            }
+                        }
+                    });
+                });
+
+            } catch (error) {
+                console.error('Error fetching products for admin list:', error);
+                productListBody.innerHTML = `<tr><td colspan="9" class="py-4 text-center text-red-500">เกิดข้อผิดพลาดในการโหลดสินค้า: ${error.message}</td></tr>`;
+            }
         }
 
+        async function setupProductFormEvents() {
+            const addEditProductForm = document.getElementById('add-edit-product-form');
+            const productIdInput = document.getElementById('product-id');
+            const productNameInput = document.getElementById('product-name');
+            const productDescriptionInput = document.getElementById('product-description');
+            const productPriceInput = document.getElementById('product-price');
+            const productImageInput = document.getElementById('product-image');
+            const productSellerIdInput = document.getElementById('product-seller-id');
+            const productRatingInput = document.getElementById('product-rating');
+            const productReviewsInput = document.getElementById('product-reviews');
+            const productStockInput = document.getElementById('product-stock');
+            const formTitle = document.getElementById('product-form-title');
+            const submitButton = document.getElementById('submit-product-button');
+            const cancelButton = document.getElementById('cancel-product-form');
+
+            // Populate seller dropdown from API
+            const allSellers = await fetchSellersFromAPI();
+            sellers = allSellers; // Update global sellers array
+            const sellerOptionsHtml = sellers.map(seller => `<option value="${seller.id}">${seller.name}</option>`).join('');
+            productSellerIdInput.innerHTML = `<option value="">เลือกร้านค้า</option>${sellerOptionsHtml}`;
+
+            if (addEditProductForm) {
+                addEditProductForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+
+                    const productData = {
+                        // ID is only included for PUT requests (editing existing product)
+                        // For POST (new product), the database will generate the ID
+                        name: productNameInput.value,
+                        description: productDescriptionInput.value,
+                        price: parseFloat(productPriceInput.value),
+                        image: productImageInput.value, // PHP API expects 'image'
+                        sellerId: productSellerIdInput.value, // PHP API expects 'sellerId'
+                        rating: parseFloat(productRatingInput.value),
+                        reviews: parseInt(productReviewsInput.value),
+                        stock: parseInt(productStockInput.value)
+                    };
+
+                    // Basic validation
+                    if (!productData.name || !productData.description || isNaN(productData.price) || productData.price < 0 || !productData.image || !productData.sellerId || isNaN(productData.rating) || productData.rating < 0 || productData.rating > 5 || isNaN(productData.reviews) || productData.reviews < 0 || isNaN(productData.stock) || productData.stock < 0) {
+                        showCustomAlert('กรุณากรอกข้อมูลสินค้าให้ครบถ้วนและถูกต้อง (ชื่อ, ราคา, คำอธิบาย, URL รูปภาพ, ผู้ขาย, เรตติ้ง (0-5), รีวิว, สต็อก)');
+                        return;
+                    }
+
+                    if (currentEditingProduct) {
+                        // Update existing product
+                        try {
+                            // Add ID to productData for PUT request
+                            productData.id = productIdInput.value;
+                            const response = await fetch(`${PRODUCTS_API_URL}?id=${productData.id}`, {
+                                method: 'PUT',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify(productData)
+                            });
+                            const result = await response.json();
+                            if (response.ok && result.message === "Product updated successfully") {
+                                showCustomAlert('สินค้าถูกแก้ไขเรียบร้อยแล้ว!');
+                                await populateProductList(); // Re-render the list in Admin
+                                addEditProductForm.reset();
+                                document.getElementById('product-form-container').classList.add('hidden');
+                                currentEditingProduct = null;
+                            } else {
+                                throw new Error(result.message || 'เกิดข้อผิดพลาดในการแก้ไขสินค้า');
+                            }
+                        } catch (error) {
+                            showCustomAlert(`แก้ไขสินค้าไม่สำเร็จ: ${error.message}`);
+                            console.error('Error updating product:', error);
+                        }
+                    } else {
+                        // Add new product
+                        try {
+                            const response = await fetch(PRODUCTS_API_URL, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify(productData)
+                            });
+                            const result = await response.json();
+                            if (response.ok && result.message === "Product added successfully") {
+                                showCustomAlert('สินค้าถูกเพิ่มเรียบร้อยแล้ว!');
+                                await populateProductList(); // Re-render the list in Admin
+                                addEditProductForm.reset();
+                                document.getElementById('product-form-container').classList.add('hidden');
+                            } else {
+                                throw new Error(result.message || 'เกิดข้อผิดพลาดในการเพิ่มสินค้า');
+                            }
+                        } catch (error) {
+                            showCustomAlert(`เพิ่มสินค้าไม่สำเร็จ: ${error.message}`);
+                            console.error('Error adding new product:', error);
+                        }
+                    }
+                });
+
+                cancelButton.addEventListener('click', () => {
+                    addEditProductForm.reset();
+                    document.getElementById('product-form-container').classList.add('hidden');
+                    currentEditingProduct = null; // Clear editing state
+                });
+            }
+        }
 
         function renderSellerManagement() {
             const sellerManagementHtml = `
-                <div class="bg-white rounded-xl shadow-lg p-4 md:p-6 mb-8"> <!-- Changed p-6 md:p-8 to p-4 md:p-6 -->
+                <div class="bg-white rounded-xl shadow-lg p-4 md:p-6 mb-8">
                     <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
                         <i data-lucide="store" class="w-6 h-6 mr-2 text-blue-600"></i>
                         จัดการผู้ขาย
                     </h2>
 
+                    <!-- Seller Add/Edit Form -->
+                    <div id="seller-form-container" class="bg-gray-50 p-4 border border-gray-200 rounded-lg mb-8">
+                        <form id="add-edit-seller-form" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <input type="hidden" id="seller-id">
+                            <div class="md:col-span-2">
+                                <h3 id="seller-form-title" class="text-xl font-semibold text-gray-800 mb-4">เพิ่มผู้ขายใหม่</h3>
+                            </div>
+                            <div>
+                                <label for="seller-name" class="block text-sm font-medium text-gray-700">ชื่อผู้ขาย</label>
+                                <input type="text" id="seller-name" name="name" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2" required>
+                            </div>
+                            <div>
+                                <label for="seller-image" class="block text-sm font-medium text-gray-700">URL รูปภาพผู้ขาย</label>
+                                <input type="text" id="seller-image" name="image" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2" placeholder="https://..." required>
+                            </div>
+                            <div class="md:col-span-2">
+                                <label for="seller-description" class="block text-sm font-medium text-gray-700">คำอธิบายผู้ขาย</label>
+                                <textarea id="seller-description" name="description" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2"></textarea>
+                            </div>
+                            <div>
+                                <label for="seller-location" class="block text-sm font-medium text-gray-700">ที่ตั้ง</label>
+                                <input type="text" id="seller-location" name="location" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2">
+                            </div>
+                            <div>
+                                <label for="seller-contact" class="block text-sm font-medium text-gray-700">ติดต่อ</label>
+                                <input type="text" id="seller-contact" name="contact" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2">
+                            </div>
+                            <div>
+                                <label for="seller-status" class="block text-sm font-medium text-gray-700">สถานะ</label>
+                                <select id="seller-status" name="status" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2" required>
+                                    <option value="active">ใช้งาน</option>
+                                    <option value="pending">รอดำเนินการ</option>
+                                    <option value="suspended">ระงับ</option>
+                                </select>
+                            </div>
+                            <div class="md:col-span-2 flex justify-end space-x-3">
+                                <button type="submit" id="submit-seller-button" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                    <i data-lucide="plus-circle" class="w-4 h-4 mr-2"></i>
+                                    เพิ่มผู้ขาย
+                                </button>
+                                <button type="button" id="cancel-seller-form" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                    ยกเลิก
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <button id="show-seller-form-button" class="mb-6 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 hidden">
+                        <i data-lucide="plus" class="w-4 h-4 mr-2"></i> เพิ่มผู้ขายใหม่
+                    </button>
+
+                    <!-- Seller List -->
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4">รายการผู้ขายทั้งหมด</h3>
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead class="bg-gray-50">
                                 <tr>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">รูปภาพ</th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ผู้ขาย</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ที่ตั้ง</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ติดต่อ</th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">สถานะ</th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">การดำเนินการ</th>
                                 </tr>
@@ -879,76 +1162,208 @@
             return sellerManagementContainer;
         }
 
-        function populateSellerList() {
+        async function populateSellerList() {
             const sellerListBody = document.getElementById('seller-list-body');
             if (!sellerListBody) return;
 
-            sellerListBody.innerHTML = ''; // Clear existing rows
+            try {
+                const allSellers = await fetchSellersFromAPI();
+                sellers = allSellers; // Update global sellers array
 
-            sellers.forEach(seller => {
-                const row = document.createElement('tr');
-                const statusClass = seller.status === 'active' ? 'bg-green-100 text-green-800' :
-                                    seller.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                                    'bg-red-100 text-red-800';
-                const statusText = seller.status === 'active' ? 'ใช้งาน' :
-                                   seller.status === 'pending' ? 'รอดำเนินการ' : 'ระงับ';
+                sellerListBody.innerHTML = ''; // Clear existing rows
 
-                row.innerHTML = `
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0 h-10 w-10">
-                                <img class="h-10 w-10 rounded-full object-cover" src="${seller.image}" alt="${seller.name}" onerror="this.onerror=null;this.src='https://placehold.co/40x40/CCCCCC/333333?text=Img';">
-                            </div>
-                            <div class="ml-4">
-                                <div class="text-sm font-medium text-gray-900">${seller.name}</div>
-                                <div class="text-sm text-gray-500">${seller.location}</div>
-                            </div>
-                        </div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${statusClass}">
-                            ${statusText}
-                        </span>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        ${seller.status !== 'active' ? `
-                            <button data-seller-id="${seller.id}" data-status="active" class="change-seller-status-button text-green-600 hover:text-green-900 mr-3">
-                                <i data-lucide="check-circle" class="w-4.5 h-4.5"></i> อนุมัติ
+                if (sellers.length === 0) {
+                    sellerListBody.innerHTML = `<tr><td colspan="7" class="py-4 text-center text-gray-500">ไม่มีผู้ขายในระบบ.</td></tr>`;
+                    return;
+                }
+
+                sellers.forEach(seller => {
+                    const row = document.createElement('tr');
+                    const statusClass = seller.status === 'active' ? 'bg-green-100 text-green-800' :
+                                        seller.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                                        'bg-red-100 text-red-800';
+                    const statusText = seller.status === 'active' ? 'ใช้งาน' :
+                                       seller.status === 'pending' ? 'รอดำเนินการ' : 'ระงับ';
+
+                    row.innerHTML = `
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${seller.id}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <img class="h-10 w-10 rounded-full object-cover" src="${seller.image}" alt="${seller.name}" onerror="this.onerror=null;this.src='https://placehold.co/40x40/CCCCCC/333333?text=Img';">
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm font-medium text-gray-900">${seller.name}</div>
+                            <div class="text-sm text-gray-500 line-clamp-1">${seller.description}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${seller.location}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${seller.contact}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${statusClass}">
+                                ${statusText}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <button data-seller-id="${seller.id}" class="edit-seller-button text-indigo-600 hover:text-indigo-900 mr-3">
+                                <i data-lucide="edit" class="w-4.5 h-4.5"></i>
                             </button>
-                        ` : ''}
-                        ${seller.status !== 'suspended' ? `
-                            <button data-seller-id="${seller.id}" data-status="suspended" class="change-seller-status-button text-red-600 hover:text-red-900">
-                                <i data-lucide="x-circle" class="w-4.5 h-4.5"></i> ระงับ
+                            <button data-seller-id="${seller.id}" class="delete-seller-button text-red-600 hover:text-red-900">
+                                <i data-lucide="trash-2" class="w-4.5 h-4.5"></i>
                             </button>
-                        ` : ''}
-                    </td>
-                `;
-                sellerListBody.appendChild(row);
-            });
-            lucide.createIcons(); // Re-render Lucide icons for new elements
-
-            // Add event listeners for status change buttons
-            sellerListBody.querySelectorAll('.change-seller-status-button').forEach(button => {
-                button.addEventListener('click', (e) => {
-                    const sellerId = e.currentTarget.dataset.sellerId;
-                    const newStatus = e.currentTarget.dataset.status;
-                    handleSellerStatusChange(sellerId, newStatus);
+                        </td>
+                    `;
+                    sellerListBody.appendChild(row);
                 });
-            });
+                lucide.createIcons();
+
+                // Add event listeners for edit and delete buttons
+                sellerListBody.querySelectorAll('.edit-seller-button').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        const sellerId = e.currentTarget.dataset.sellerId;
+                        const sellerToEdit = sellers.find(s => s.id == sellerId);
+                        if (sellerToEdit) {
+                            currentEditingSeller = sellerToEdit;
+                            document.getElementById('seller-id').value = sellerToEdit.id;
+                            document.getElementById('seller-name').value = sellerToEdit.name;
+                            document.getElementById('seller-description').value = sellerToEdit.description;
+                            document.getElementById('seller-image').value = sellerToEdit.image;
+                            document.getElementById('seller-location').value = sellerToEdit.location;
+                            document.getElementById('seller-contact').value = sellerToEdit.contact;
+                            document.getElementById('seller-status').value = sellerToEdit.status;
+
+                            document.getElementById('seller-form-title').textContent = 'แก้ไขผู้ขาย';
+                            document.getElementById('submit-seller-button').innerHTML = `<i data-lucide="edit" class="w-4 h-4 mr-2"></i> บันทึกการแก้ไข`;
+                            document.getElementById('seller-form-container').classList.remove('hidden');
+                            lucide.createIcons();
+                        }
+                    });
+                });
+
+                sellerListBody.querySelectorAll('.delete-seller-button').forEach(button => {
+                    button.addEventListener('click', async (e) => {
+                        const sellerId = e.currentTarget.dataset.sellerId;
+                        if (confirm('คุณแน่ใจหรือไม่ที่ต้องการลบผู้ขายนี้?')) {
+                            try {
+                                const response = await fetch(`${SELLERS_API_URL}?id=${sellerId}`, {
+                                    method: 'DELETE'
+                                });
+                                const result = await response.json();
+                                if (response.ok && result.message === "Seller deleted successfully") {
+                                    showCustomAlert('ผู้ขายถูกลบเรียบร้อยแล้ว!');
+                                    await populateSellerList();
+                                    await populateProductList(); // Update products list as well, in case a seller was removed
+                                } else {
+                                    throw new Error(result.message || 'เกิดข้อผิดพลาดในการลบผู้ขาย');
+                                }
+                            } catch (error) {
+                                console.error('Error deleting seller:', error);
+                                showCustomAlert('ลบผู้ขายไม่สำเร็จ: ' + error.message);
+                            }
+                        }
+                    });
+                });
+
+            } catch (error) {
+                console.error('Error fetching sellers for admin list:', error);
+                sellerListBody.innerHTML = `<tr><td colspan="7" class="py-4 text-center text-red-500">เกิดข้อผิดพลาดในการโหลดผู้ขาย: ${error.message}</td></tr>`;
+            }
         }
 
-        function handleSellerStatusChange(sellerId, newStatus) {
-            sellers = sellers.map(seller =>
-                seller.id === sellerId ? { ...seller, status: newStatus } : seller
-            );
-            showCustomAlert(`สถานะผู้ขาย ${getSellerById(sellerId).name} ถูกเปลี่ยนเป็น ${newStatus === 'active' ? 'ใช้งาน' : newStatus === 'pending' ? 'รอดำเนินการ' : 'ระงับ'} แล้ว!`);
-            populateSellerList(); // Re-render seller list
-            renderHomePage(); // Update home page as well (to reflect active sellers)
+        async function setupSellerFormEvents() {
+            const addEditSellerForm = document.getElementById('add-edit-seller-form');
+            const sellerIdInput = document.getElementById('seller-id');
+            const sellerNameInput = document.getElementById('seller-name');
+            const sellerDescriptionInput = document.getElementById('seller-description');
+            const sellerImageInput = document.getElementById('seller-image');
+            const sellerLocationInput = document.getElementById('seller-location');
+            const sellerContactInput = document.getElementById('seller-contact');
+            const sellerStatusInput = document.getElementById('seller-status');
+            const formTitle = document.getElementById('seller-form-title');
+            const submitButton = document.getElementById('submit-seller-button');
+            const cancelButton = document.getElementById('cancel-seller-form');
+
+            if (addEditSellerForm) {
+                addEditSellerForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+
+                    const sellerData = {
+                        name: sellerNameInput.value,
+                        description: sellerDescriptionInput.value,
+                        image: sellerImageInput.value,
+                        location: sellerLocationInput.value,
+                        contact: sellerContactInput.value,
+                        status: sellerStatusInput.value
+                    };
+
+                    // Basic validation
+                    if (!sellerData.name || !sellerData.image || !sellerData.status) {
+                        showCustomAlert('กรุณากรอกชื่อผู้ขาย, URL รูปภาพ และสถานะ');
+                        return;
+                    }
+
+                    if (currentEditingSeller) {
+                        // Update existing seller
+                        try {
+                            sellerData.id = sellerIdInput.value;
+                            const response = await fetch(`${SELLERS_API_URL}?id=${sellerData.id}`, {
+                                method: 'PUT',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify(sellerData)
+                            });
+                            const result = await response.json();
+                            if (response.ok && result.message === "Seller updated successfully") {
+                                showCustomAlert('ผู้ขายถูกแก้ไขเรียบร้อยแล้ว!');
+                                await populateSellerList();
+                                await populateProductList(); // Update products list as well, in case seller name changed
+                                addEditSellerForm.reset();
+                                document.getElementById('seller-form-container').classList.add('hidden');
+                                currentEditingSeller = null;
+                            } else {
+                                throw new Error(result.message || 'เกิดข้อผิดพลาดในการแก้ไขผู้ขาย');
+                            }
+                        } catch (error) {
+                            showCustomAlert(`แก้ไขผู้ขายไม่สำเร็จ: ${error.message}`);
+                            console.error('Error updating seller:', error);
+                        }
+                    } else {
+                        // Add new seller
+                        try {
+                            const response = await fetch(SELLERS_API_URL, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify(sellerData)
+                            });
+                            const result = await response.json();
+                            if (response.ok && result.message === "Seller added successfully") {
+                                showCustomAlert('ผู้ขายถูกเพิ่มเรียบร้อยแล้ว!');
+                                await populateSellerList();
+                                await populateProductList(); // Update products list as well, in case new seller is active
+                                addEditSellerForm.reset();
+                                document.getElementById('seller-form-container').classList.add('hidden');
+                            } else {
+                                throw new Error(result.message || 'เกิดข้อผิดพลาดในการเพิ่มผู้ขาย');
+                            }
+                        } catch (error) {
+                            showCustomAlert(`เพิ่มผู้ขายไม่สำเร็จ: ${error.message}`);
+                            console.error('Error adding new seller:', error);
+                        }
+                    }
+                });
+
+                cancelButton.addEventListener('click', () => {
+                    addEditSellerForm.reset();
+                    document.getElementById('seller-form-container').classList.add('hidden');
+                    currentEditingSeller = null;
+                });
+            }
         }
+
 
         function renderOrderManagement() {
             return `
-                <div class="bg-white rounded-xl shadow-lg p-4 md:p-6 mb-8"> <!-- Changed p-6 md:p-8 to p-4 md:p-6 -->
+                <div class="bg-white rounded-xl shadow-lg p-4 md:p-6 mb-8">
                     <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
                         <i data-lucide="shopping-cart" class="w-6 h-6 mr-2 text-blue-600"></i>
                         จัดการคำสั่งซื้อ
@@ -964,7 +1379,7 @@
 
         function renderReportsStatistics() {
             return `
-                <div class="bg-white rounded-xl shadow-lg p-4 md:p-6 mb-8"> <!-- Changed p-6 md:p-8 to p-4 md:p-6 -->
+                <div class="bg-white rounded-xl shadow-lg p-4 md:p-6 mb-8">
                     <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
                         <i data-lucide="bar-chart-2" class="w-6 h-6 mr-2 text-blue-600"></i>
                         รายงานและสถิติ
@@ -980,7 +1395,7 @@
 
         function renderPromotionManagement() {
             return `
-                <div class="bg-white rounded-xl shadow-lg p-4 md:p-6 mb-8"> <!-- Changed p-6 md:p-8 to p-4 md:p-6 -->
+                <div class="bg-white rounded-xl shadow-lg p-4 md:p-6 mb-8">
                     <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
                         <i data-lucide="gift" class="w-6 h-6 mr-2 text-blue-600"></i>
                         จัดการโปรโมชันและส่วนลด
@@ -996,7 +1411,7 @@
 
         function renderUserManagement() {
             return `
-                <div class="bg-white rounded-xl shadow-lg p-4 md:p-6 mb-8"> <!-- Changed p-6 md:p-8 to p-4 md:p-6 -->
+                <div class="bg-white rounded-xl shadow-lg p-4 md:p-6 mb-8">
                     <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
                         <i data-lucide="users" class="w-6 h-6 mr-2 text-blue-600"></i>
                         จัดการผู้ใช้งาน
@@ -1078,7 +1493,7 @@
                 </div>
             `;
             mainContent.innerHTML = adminPanelHtml;
-            lucide.createIcons(); // Re-render Lucide icons
+            lucide.createIcons();
 
             // Setup event listeners for sidebar tabs
             const adminContentArea = document.getElementById('admin-content-area');
@@ -1126,8 +1541,25 @@
                 if (tabName === 'products') {
                     populateProductList();
                     setupProductFormEvents();
+                    document.getElementById('show-product-form-button').addEventListener('click', () => {
+                        document.getElementById('product-form-container').classList.remove('hidden');
+                        document.getElementById('add-edit-product-form').reset();
+                        document.getElementById('product-form-title').textContent = 'เพิ่มสินค้าใหม่';
+                        document.getElementById('submit-product-button').innerHTML = `<i data-lucide="plus-circle" class="w-4 h-4 mr-2"></i> เพิ่มสินค้า`;
+                        currentEditingProduct = null;
+                        lucide.createIcons();
+                    });
                 } else if (tabName === 'sellers') {
                     populateSellerList();
+                    setupSellerFormEvents(); // Setup seller form events
+                    document.getElementById('show-seller-form-button').addEventListener('click', () => {
+                        document.getElementById('seller-form-container').classList.remove('hidden');
+                        document.getElementById('add-edit-seller-form').reset();
+                        document.getElementById('seller-form-title').textContent = 'เพิ่มผู้ขายใหม่';
+                        document.getElementById('submit-seller-button').innerHTML = `<i data-lucide="plus-circle" class="w-4 h-4 mr-2"></i> เพิ่มผู้ขาย`;
+                        currentEditingSeller = null;
+                        lucide.createIcons();
+                    });
                 }
             }
 
@@ -1145,14 +1577,14 @@
         }
 
         // --- Main Render Function ---
-        function renderPage() {
-            updateCartItemCount(); // Always update cart count
+        async function renderPage() {
+            updateCartItemCount();
             switch (currentPage) {
                 case 'home':
-                    renderHomePage();
+                    await renderHomePage();
                     break;
                 case 'productDetail':
-                    renderProductDetailPage();
+                    await renderProductDetailPage();
                     break;
                 case 'cart':
                     renderCartPage();
@@ -1161,29 +1593,34 @@
                     renderAdminPanel();
                     break;
                 default:
-                    renderHomePage();
+                    await renderHomePage();
             }
         }
 
         // --- Event Listeners for Header Buttons ---
-        homeButton.addEventListener('click', () => navigateTo('home'));
+        // Moved homeButton declaration and event listener inside DOMContentLoaded
+        // homeButton.addEventListener('click', () => navigateTo('home')); // This line caused the error
         cartButton.addEventListener('click', () => navigateTo('cart'));
         
-        // Modified adminPanelButton event listener to show password modal
         adminPanelButton.addEventListener('click', () => {
             showPasswordModal();
         });
 
-        searchInput.addEventListener('input', (e) => {
+        searchInput.addEventListener('input', async (e) => {
             searchTerm = e.target.value;
             if (currentPage === 'home') {
-                renderHomePage(); // Re-render home page with filtered results
+                await renderHomePage();
             }
         });
 
         // --- Initial App Load ---
-        document.addEventListener('DOMContentLoaded', () => {
-            renderPage();
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Declare homeButton here, inside DOMContentLoaded
+            const homeButton = document.getElementById('home-button');
+            if (homeButton) { // Check if homeButton exists before adding listener
+                homeButton.addEventListener('click', () => navigateTo('home'));
+            }
+            await renderPage();
         });
 
         // --- Cart Logic ---
@@ -1192,7 +1629,13 @@
             if (existingItemIndex > -1) {
                 cartItems[existingItemIndex].quantity += 1;
             } else {
-                cartItems.push({ ...product, quantity: 1 });
+                cartItems.push({
+                    id: product.id,
+                    name: product.name,
+                    price: parseFloat(product.price),
+                    image: product.image_url,
+                    quantity: 1
+                });
             }
             showCustomAlert(`${product.name} ถูกเพิ่มลงในตะกร้าแล้ว!`);
             updateCartItemCount();
@@ -1201,7 +1644,7 @@
         function handleRemoveFromCart(productId) {
             cartItems = cartItems.filter(item => item.id !== productId);
             showCustomAlert('สินค้าถูกลบออกจากตะกร้าแล้ว!');
-            renderCartPage(); // Re-render cart page
+            renderCartPage();
             updateCartItemCount();
         }
 
